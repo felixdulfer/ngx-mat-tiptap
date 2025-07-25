@@ -1,0 +1,165 @@
+<div class="app-container">
+  <header class="demo-header">
+    <h1>{{ title }}</h1>
+    <p>A comprehensive demo of the ngx-mat-tiptap rich text editor component</p>
+  </header>
+
+  <!-- Basic Editor Section -->
+  <section class="demo-section">
+    <h2 class="section-title">Basic Editor (JSON Output)</h2>
+    <p class="section-description">
+      Simple editor with JSON output format and placeholder text
+    </p>
+
+    <div class="editor-grid">
+      <div class="editor-section">
+        <mat-card>
+          <mat-card-content>
+            <ngx-mat-tiptap
+              [content]="basicContent"
+              [config]="basicConfig"
+              (contentchange)="onBasicContentChange($event)"
+            >
+            </ngx-mat-tiptap>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="output-section">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>JSON Output</mat-card-title>
+            <mat-card-actions>
+              <button
+                mat-button
+                (click)="copyToClipboard(getOutputAsString(basicOutput))"
+              >
+                Copy to Clipboard
+              </button>
+            </mat-card-actions>
+          </mat-card-header>
+          <mat-card-content>
+            <pre class="output-code">{{ getOutputAsString(basicOutput) }}</pre>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rich Editor Section -->
+  <section class="demo-section">
+    <h2 class="section-title">Rich Editor (HTML Output)</h2>
+    <p class="section-description">
+      Advanced editor with HTML output format and rich content
+    </p>
+
+    <div class="editor-grid">
+      <div class="editor-section">
+        <mat-card>
+          <mat-card-content>
+            <ngx-mat-tiptap
+              [content]="richContent"
+              [config]="richConfig"
+              (contentchange)="onRichContentChange($event)"
+            >
+            </ngx-mat-tiptap>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="output-section">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>HTML Output</mat-card-title>
+            <mat-card-actions>
+              <button
+                mat-button
+                (click)="copyToClipboard(getOutputAsString(richOutput))"
+              >
+                Copy to Clipboard
+              </button>
+            </mat-card-actions>
+          </mat-card-header>
+          <mat-card-content>
+            <pre class="output-code">{{ getOutputAsString(richOutput) }}</pre>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Read-only Editor Section -->
+  <section class="demo-section">
+    <h2 class="section-title">Read-only Editor</h2>
+    <p class="section-description">
+      Editor in read-only mode for displaying content
+    </p>
+
+    <div class="editor-grid">
+      <div class="editor-section">
+        <mat-card>
+          <mat-card-content>
+            <ngx-mat-tiptap
+              [content]="readonlyContent"
+              [config]="readonlyConfig"
+              (contentchange)="onReadonlyContentChange($event)"
+            >
+            </ngx-mat-tiptap>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="output-section">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Content Structure</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <pre class="output-code">{{
+              getOutputAsString(readonlyOutput)
+            }}</pre>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="demo-section">
+    <h2 class="section-title">Library Features</h2>
+    <p class="section-description">
+      Key capabilities and benefits of the ngx-mat-tiptap library
+    </p>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="features-grid">
+          <div class="feature-item">
+            <h3>🎨 Material Design</h3>
+            <p>Built with Angular Material for consistent UI/UX</p>
+          </div>
+          <div class="feature-item">
+            <h3>📝 Rich Text Editing</h3>
+            <p>Full-featured rich text editor with formatting options</p>
+          </div>
+          <div class="feature-item">
+            <h3>🔄 Multiple Output Formats</h3>
+            <p>Support for both JSON and HTML output formats</p>
+          </div>
+          <div class="feature-item">
+            <h3>⚙️ Configurable</h3>
+            <p>Customizable placeholder, editable state, and more</p>
+          </div>
+          <div class="feature-item">
+            <h3>📱 Responsive</h3>
+            <p>Works seamlessly across different screen sizes</p>
+          </div>
+          <div class="feature-item">
+            <h3>🚀 Standalone Component</h3>
+            <p>Easy to integrate with Angular standalone components</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</div>
