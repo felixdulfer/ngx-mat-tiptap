@@ -34,40 +34,44 @@ import { MatDividerModule } from '@angular/material/divider';
       (focusin)="onFocusIn()"
       (focusout)="onFocusOut($event)"
     ></div>
-    <div class="tiptap-toolbar">
-      <button
-        matIconButton
-        type="button"
-        class="toolbar-btn"
-        [class.active]="isBoldActive()"
-        (click)="toggleBold()"
-        [disabled]="disabled"
-        title="Bold"
-      >
-        <mat-icon>format_bold</mat-icon>
-      </button>
-      <button
-        matIconButton
-        type="button"
-        class="toolbar-btn"
-        [class.active]="isItalicActive()"
-        (click)="toggleItalic()"
-        [disabled]="disabled"
-        title="Italic"
-      >
-        <mat-icon>format_italic</mat-icon>
-      </button>
-      <button
-        matIconButton
-        type="button"
-        class="toolbar-btn"
-        [class.active]="isBulletListActive()"
-        (click)="toggleBulletList()"
-        [disabled]="disabled"
-        title="Bullet List"
-      >
-        <mat-icon>format_list_bulleted</mat-icon>
-      </button>
+    <div class="expander" [class.expanded]="!empty">
+      <div class="expander-content">
+        <div class="tiptap-toolbar">
+          <button
+            matIconButton
+            type="button"
+            class="toolbar-btn"
+            [class.active]="isBoldActive()"
+            (click)="toggleBold()"
+            [disabled]="disabled"
+            title="Bold"
+          >
+            <mat-icon>format_bold</mat-icon>
+          </button>
+          <button
+            matIconButton
+            type="button"
+            class="toolbar-btn"
+            [class.active]="isItalicActive()"
+            (click)="toggleItalic()"
+            [disabled]="disabled"
+            title="Italic"
+          >
+            <mat-icon>format_italic</mat-icon>
+          </button>
+          <button
+            matIconButton
+            type="button"
+            class="toolbar-btn"
+            [class.active]="isBulletListActive()"
+            (click)="toggleBulletList()"
+            [disabled]="disabled"
+            title="Bullet List"
+          >
+            <mat-icon>format_list_bulleted</mat-icon>
+          </button>
+        </div>
+      </div>
     </div>
   `,
   styles: `
@@ -86,6 +90,26 @@ import { MatDividerModule } from '@angular/material/divider';
       }
     }
 
+    .expander {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+      transition: grid-template-rows 0.2s;
+    }
+    
+    .expander-content {
+      min-height: 0;
+      transition: visibility 0.2s;
+      visibility: hidden;
+    }
+    
+    .expander.expanded {
+      grid-template-rows: 1fr;
+    }
+    
+    .expander.expanded .expander-content {
+      visibility: visible;
+    }
 
     .tiptap-toolbar {
       display: flex !important;
@@ -110,7 +134,7 @@ import { MatDividerModule } from '@angular/material/divider';
           height: unset;
           font-size: 24px;
         }
-s      }
+      }
     }
 
   `,
