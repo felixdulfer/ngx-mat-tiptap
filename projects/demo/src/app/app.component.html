@@ -10,7 +10,7 @@
           <mat-label>Tiptap editor</mat-label>
         </mat-form-field>
         <div class="value-display">
-          <pre><code>{{ form.get('tiptapContent')?.value || 'No content' }}</code></pre>
+          <pre><code>{{ form.get('tiptapContent')?.value | json }}</code></pre>
         </div>
       </div>
       <div class="editor-section">

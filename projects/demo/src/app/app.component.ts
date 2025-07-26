@@ -1,5 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +13,7 @@ import { NgxMatTiptap } from 'ngx-mat-tiptap';
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    JsonPipe,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
@@ -21,10 +23,23 @@ import { NgxMatTiptap } from 'ngx-mat-tiptap';
 export class AppComponent implements OnDestroy {
   form: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      tiptapContent: ['<p>Hello, Tiptap!</p>', [Validators.required, Validators.minLength(10)]],
-      regularText: ['', [Validators.required, Validators.minLength(5)]]
+  constructor() {
+    this.form = new FormGroup({
+      tiptapContent: new FormControl({
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'Hello, Tiptap!'
+              }
+            ]
+          }
+        ]
+      }, [Validators.required]),
+      regularText: new FormControl('', [Validators.required, Validators.minLength(5)])
     });
 
     // Subscribe to form value changes
@@ -49,7 +64,20 @@ export class AppComponent implements OnDestroy {
 
   resetForm(): void {
     this.form.reset({
-      tiptapContent: '<p>Hello, Tiptap!</p>',
+      tiptapContent: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'Hello, Tiptap!'
+              }
+            ]
+          }
+        ]
+      },
       regularText: ''
     });
   }

@@ -10,15 +10,19 @@ import {
   inject,
   ViewEncapsulation,
 } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { Subject } from 'rxjs';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'ngx-mat-tiptap',
   standalone: true,
+  imports: [MatIconModule, MatButtonModule, MatDividerModule],
   template: `
     <div
       #editorElement
@@ -30,6 +34,41 @@ import StarterKit from '@tiptap/starter-kit';
       (focusin)="onFocusIn()"
       (focusout)="onFocusOut($event)"
     ></div>
+    <div class="tiptap-toolbar">
+      <button
+        matIconButton
+        type="button"
+        class="toolbar-btn"
+        [class.active]="isBoldActive()"
+        (click)="toggleBold()"
+        [disabled]="disabled"
+        title="Bold"
+      >
+        <mat-icon>format_bold</mat-icon>
+      </button>
+      <button
+        matIconButton
+        type="button"
+        class="toolbar-btn"
+        [class.active]="isItalicActive()"
+        (click)="toggleItalic()"
+        [disabled]="disabled"
+        title="Italic"
+      >
+        <mat-icon>format_italic</mat-icon>
+      </button>
+      <button
+        matIconButton
+        type="button"
+        class="toolbar-btn"
+        [class.active]="isBulletListActive()"
+        (click)="toggleBulletList()"
+        [disabled]="disabled"
+        title="Bullet List"
+      >
+        <mat-icon>format_list_bulleted</mat-icon>
+      </button>
+    </div>
   `,
   styles: `
     .ngx-mat-tiptap {
@@ -45,6 +84,34 @@ import StarterKit from '@tiptap/starter-kit';
         }
       }
     }
+
+
+    .tiptap-toolbar {
+      display: flex !important;
+      gap: 4px;
+      margin-top: 8px;
+      
+      .toolbar-btn {
+        --mat-icon-button-container-shape: 12px;
+        border: 1px solid var(--mat-divider-color);
+
+        &.active {
+          background-color: var(--mat-sys-primary);
+          color: var(--mat-sys-on-primary);
+        }
+        
+        &.mat-mdc-icon-button .mat-mdc-button-touch-target {
+          width: 30px;
+          height: 30px;
+        }
+        .mat-icon {
+          width: unset;
+          height: unset;
+          font-size: 24px;
+        }
+s      }
+    }
+
   `,
   providers: [
     {
@@ -77,7 +144,7 @@ export class NgxMatTiptap
   // Internal writable signals for state management
   private _value = signal<any>('');
   private _disabled = signal(false);
-  private editor: Editor | null = null;
+  public editor: Editor | null = null;
 
   stateChanges = new Subject<void>();
   focused = false;
@@ -138,12 +205,12 @@ export class NgxMatTiptap
     this.editor = new Editor({
       element: element.nativeElement,
       extensions: [StarterKit],
-      content: this.value || '',
+      content: this.value || null,
       editable: !this.disabled,
       onUpdate: ({ editor }) => {
-        const html = editor.getHTML();
-        this._value.set(html);
-        this.onChange(html);
+        const json = editor.getJSON();
+        this._value.set(json);
+        this.onChange(json);
         this.stateChanges.next();
       },
       onFocus: () => {
@@ -153,6 +220,8 @@ export class NgxMatTiptap
         this.onFocusOut(new FocusEvent('blur'));
       },
     });
+
+    console.log('Editor initialized:', this.editor);
   }
 
   onContainerClick(event: MouseEvent) {
@@ -201,8 +270,8 @@ export class NgxMatTiptap
 
   writeValue(value: any): void {
     this._value.set(value);
-    if (this.editor && value !== this.editor.getHTML()) {
-      this.editor.commands.setContent(value || '');
+    if (this.editor && value !== this.editor.getJSON()) {
+      this.editor.commands.setContent(value || null);
     }
     this.stateChanges.next();
   }
@@ -216,7 +285,18 @@ export class NgxMatTiptap
   }
 
   get empty(): boolean {
-    return !this.value || this.value.length === 0 || this.value === '<p></p>';
+    return (
+      !this.value ||
+      (typeof this.value === 'object' &&
+        (!this.value.content ||
+          (Array.isArray(this.value.content) &&
+            this.value.content.length === 0) ||
+          (Array.isArray(this.value.content) &&
+            this.value.content.length === 1 &&
+            this.value.content[0].type === 'paragraph' &&
+            (!this.value.content[0].content ||
+              this.value.content[0].content.length === 0))))
+    );
   }
 
   get shouldLabelFloat(): boolean {
@@ -227,5 +307,31 @@ export class NgxMatTiptap
     return this.ngControl
       ? !!(this.ngControl.invalid && this.ngControl.touched)
       : false;
+  }
+
+  // Toolbar helper methods
+  isBoldActive(): boolean {
+    return this.editor?.isActive('bold') || false;
+  }
+
+  isItalicActive(): boolean {
+    return this.editor?.isActive('italic') || false;
+  }
+
+  isBulletListActive(): boolean {
+    return this.editor?.isActive('bulletList') || false;
+  }
+
+  toggleBold(): void {
+    console.log('Toggle bold clicked, editor:', this.editor);
+    this.editor?.chain().focus().toggleBold().run();
+  }
+
+  toggleItalic(): void {
+    this.editor?.chain().focus().toggleItalic().run();
+  }
+
+  toggleBulletList(): void {
+    this.editor?.chain().focus().toggleBulletList().run();
   }
 }
