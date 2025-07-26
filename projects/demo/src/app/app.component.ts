@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 
 import { MatChipsModule } from '@angular/material/chips';
 import { NgxMatTiptap, NgxMatTiptapConfig } from 'ngx-mat-tiptap';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -13,12 +13,12 @@ import { NgxMatTiptap, NgxMatTiptapConfig } from 'ngx-mat-tiptap';
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatCardModule,
     MatButtonModule,
     MatChipsModule,
     NgxMatTiptap,
+    JsonPipe,
   ],
 })
 export class AppComponent {
@@ -103,5 +103,4 @@ export class AppComponent {
   onContentChange(content: any) {
     this.output = content;
   }
-
 }

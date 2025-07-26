@@ -6,4 +6,11 @@
 .demo-section {
   display: flex;
   justify-content: center;
+  gap: 1rem;
+}
+
+.output-card,
+.editor-section {
+  width: 100%;
+  max-width: 640px;
 }

@@ -2,16 +2,18 @@
   <h1>ngx-mat-tiptap Demo</h1>
 </header>
 <section class="demo-section">
-  <div class="editor-grid">
-    <div class="editor-section">
-      <ngx-mat-tiptap
-        [content]="content"
-        [config]="config"
-        (contentchange)="onContentChange($event)"
-      />
-    </div>
-    <div class="output-section">
-      <pre class="output-code"><code>{{ output | json }}</code></pre>
-    </div>
+  <div class="editor-section">
+    <ngx-mat-tiptap
+      [content]="content"
+      [config]="config"
+      (contentchange)="onContentChange($event)"
+    />
   </div>
+  <mat-card class="output-card">
+    <mat-card-content>
+      <div class="output-section">
+        <pre class="output-code"><code>{{ output | json }}</code></pre>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </section>
