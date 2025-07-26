@@ -77,8 +77,9 @@ import { MatDividerModule } from '@angular/material/divider';
 
     .tiptap-editor {
       width: 100%;
-
+      
       .tiptap.ProseMirror {
+        outline: 0;
         p {
           margin: 0;
         }
@@ -93,7 +94,7 @@ import { MatDividerModule } from '@angular/material/divider';
       
       .toolbar-btn {
         --mat-icon-button-container-shape: 12px;
-        border: 1px solid var(--mat-divider-color);
+        border: 1px solid var(--mat-sys-outline-variant);
 
         &.active {
           background-color: var(--mat-sys-primary);
