@@ -22,26 +22,7 @@ import { NgxMatTiptap, NgxMatTiptapConfig } from 'ngx-mat-tiptap';
   ],
 })
 export class AppComponent {
-  title = 'ngx-mat-tiptap Demo';
-
-  // Basic editor content
-  basicContent = {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'text',
-            text: 'This is a basic editor with rich text formatting capabilities. You can edit this content and see the changes in real-time.',
-          },
-        ],
-      },
-    ],
-  };
-
-  // Rich content with various elements
-  richContent = {
+  content = {
     type: 'doc',
     content: [
       {
@@ -111,68 +92,16 @@ export class AppComponent {
     ],
   };
 
-  // Read-only content
-  readonlyContent = {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'text',
-            text: 'This is a read-only editor. The content cannot be modified.',
-          },
-        ],
-      },
-    ],
-  };
-
-  // Editor configurations
-  basicConfig: NgxMatTiptapConfig = {
-    outputFormat: 'json',
-    editable: true,
-    placeholder: 'Start typing your content...',
-  };
-
-  richConfig: NgxMatTiptapConfig = {
+  config: NgxMatTiptapConfig = {
     outputFormat: 'html',
     editable: true,
     placeholder: 'Rich text editor with HTML output...',
   };
 
-  readonlyConfig: NgxMatTiptapConfig = {
-    outputFormat: 'json',
-    editable: false,
-  };
+  output: any = this.content;
 
-  // Output content
-  basicOutput: any = this.basicContent;
-  richOutput: any = this.richContent;
-  readonlyOutput: any = this.readonlyContent;
-
-  // Event handlers
-  onBasicContentChange(content: any) {
-    this.basicOutput = content;
+  onContentChange(content: any) {
+    this.output = content;
   }
 
-  onRichContentChange(content: any) {
-    this.richOutput = content;
-  }
-
-  onReadonlyContentChange(content: any) {
-    this.readonlyOutput = content;
-  }
-
-  // Utility methods
-  getOutputAsString(output: any): string {
-    return typeof output === 'string'
-      ? output
-      : JSON.stringify(output, null, 2);
-  }
-
-  copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Content copied to clipboard');
-    });
-  }
 }
