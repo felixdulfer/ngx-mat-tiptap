@@ -10,7 +10,6 @@
           <mat-label>Tiptap editor</mat-label>
         </mat-form-field>
         <div class="value-display">
-          <h4>Tiptap Content Value:</h4>
           <pre><code>{{ form.get('tiptapContent')?.value || 'No content' }}</code></pre>
         </div>
       </div>
@@ -24,10 +23,6 @@
             formControlName="regularText"
           ></textarea>
         </mat-form-field>
-        <div class="value-display">
-          <h4>Regular Text Value:</h4>
-          <pre><code>{{ form.get('regularText')?.value || 'No content' }}</code></pre>
-        </div>
       </div>
     </div>
   </form>
