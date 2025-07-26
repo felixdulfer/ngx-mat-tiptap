@@ -1,11 +1,9 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
+import { Component, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-
-import { MatChipsModule } from '@angular/material/chips';
-import { NgxMatTiptap, NgxMatTiptapConfig } from 'ngx-mat-tiptap';
-import { JsonPipe } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { NgxMatTiptap } from 'ngx-mat-tiptap';
 
 @Component({
   selector: 'app-root',
@@ -13,94 +11,46 @@ import { JsonPipe } from '@angular/common';
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [
-    FormsModule,
-    MatCardModule,
+    ReactiveFormsModule,
     MatButtonModule,
-    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
     NgxMatTiptap,
-    JsonPipe,
   ],
 })
-export class AppComponent {
-  content = {
-    type: 'doc',
-    content: [
-      {
-        type: 'heading',
-        attrs: { level: 1 },
-        content: [{ type: 'text', text: 'Rich Text Editor Demo' }],
-      },
-      {
-        type: 'paragraph',
-        content: [
-          { type: 'text', text: 'This editor supports ' },
-          { type: 'text', marks: [{ type: 'bold' }], text: 'bold' },
-          { type: 'text', text: ', ' },
-          { type: 'text', marks: [{ type: 'italic' }], text: 'italic' },
-          { type: 'text', text: ', and ' },
-          { type: 'text', marks: [{ type: 'code' }], text: 'code' },
-          { type: 'text', text: ' formatting.' },
-        ],
-      },
-      {
-        type: 'heading',
-        attrs: { level: 2 },
-        content: [{ type: 'text', text: 'Features' }],
-      },
-      {
-        type: 'bulletList',
-        content: [
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Rich text formatting' }],
-              },
-            ],
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Headings and paragraphs' }],
-              },
-            ],
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Lists and code blocks' }],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        type: 'codeBlock',
-        attrs: { language: 'typescript' },
-        content: [
-          {
-            type: 'text',
-            text: "// Example code block\nconst editor = new NgxMatTiptap({\n  outputFormat: 'json'\n});",
-          },
-        ],
-      },
-    ],
-  };
+export class AppComponent implements OnDestroy {
+  form: FormGroup;
 
-  config: NgxMatTiptapConfig = {
-    outputFormat: 'html',
-    editable: true,
-    placeholder: 'Rich text editor with HTML output...',
-  };
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      tiptapContent: ['<p>Hello, Tiptap!</p>', [Validators.required, Validators.minLength(10)]],
+      regularText: ['', [Validators.required, Validators.minLength(5)]]
+    });
 
-  output: any = this.content;
+    // Subscribe to form value changes
+    this.form.valueChanges.subscribe(values => {
+      console.log('Form values changed:', values);
+    });
+  }
 
-  onContentChange(content: any) {
-    this.output = content;
+  ngOnDestroy(): void {
+    // No need to destroy editor manually as it's handled by the component
+  }
+
+  onSubmit(): void {
+    if (this.form.valid) {
+      console.log('Form submitted:', this.form.value);
+      alert('Form submitted successfully! Check console for values.');
+    } else {
+      console.log('Form is invalid:', this.form.errors);
+      alert('Please fill in all required fields correctly.');
+    }
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      tiptapContent: '<p>Hello, Tiptap!</p>',
+      regularText: ''
+    });
   }
 }

@@ -2,18 +2,33 @@
   <h1>ngx-mat-tiptap Demo</h1>
 </header>
 <section class="demo-section">
-  <div class="editor-section">
-    <ngx-mat-tiptap
-      [content]="content"
-      [config]="config"
-      (contentchange)="onContentChange($event)"
-    />
-  </div>
-  <mat-card class="output-card">
-    <mat-card-content>
-      <div class="output-section">
-        <pre class="output-code"><code>{{ output | json }}</code></pre>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="editors-container">
+      <div class="editor-section">
+        <mat-form-field appearance="outline" class="tiptap-editor">
+          <ngx-mat-tiptap formControlName="tiptapContent" />
+          <mat-label>Tiptap editor</mat-label>
+        </mat-form-field>
+        <div class="value-display">
+          <h4>Tiptap Content Value:</h4>
+          <pre><code>{{ form.get('tiptapContent')?.value || 'No content' }}</code></pre>
+        </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+      <div class="editor-section">
+        <mat-form-field appearance="outline" class="regular-textarea">
+          <mat-label>Regular textarea</mat-label>
+          <textarea
+            matInput
+            cdkTextareaAutosize
+            cdkAutosizeMaxRows="10"
+            formControlName="regularText"
+          ></textarea>
+        </mat-form-field>
+        <div class="value-display">
+          <h4>Regular Text Value:</h4>
+          <pre><code>{{ form.get('regularText')?.value || 'No content' }}</code></pre>
+        </div>
+      </div>
+    </div>
+  </form>
 </section>

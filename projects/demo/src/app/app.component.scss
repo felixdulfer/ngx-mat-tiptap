@@ -9,8 +9,77 @@
   gap: 1rem;
 }
 
+.editors-container {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
 .output-card,
 .editor-section {
   width: 100%;
-  max-width: 640px;
+  max-width: 600px;
+}
+
+.regular-textarea {
+  width: 100%;
+}
+
+.tiptap-editor {
+  width: 100%;
+  
+  ::ng-deep .mat-form-field-infix {
+    padding: 0;
+    border-top: none;
+  }
+  
+  ::ng-deep .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+  
+  ::ng-deep ngx-mat-tiptap {
+    display: block;
+    width: 100%;
+  }
+}
+
+.value-display {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.value-display h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.value-display pre {
+  margin: 0;
+  padding: 0.5rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.value-display code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  color: #333;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }

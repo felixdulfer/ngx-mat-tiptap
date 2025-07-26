@@ -1,179 +1,211 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TiptapEditorDirective } from 'ngx-tiptap';
+import { Component, ElementRef, input, signal, NgZone, OnDestroy, Optional, Self, viewChild, ViewChild, OnInit } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { MatFormFieldControl } from '@angular/material/form-field';
+import { Subject } from 'rxjs';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-
-export interface NgxMatTiptapConfig {
-  placeholder?: string;
-  editable?: boolean;
-  content?: string | object;
-  outputFormat?: 'html' | 'json';
-}
 
 @Component({
   selector: 'ngx-mat-tiptap',
   standalone: true,
-  imports: [CommonModule, TiptapEditorDirective],
   template: `
-    <div class="mat-tiptap-container">
-      <!-- Editor Content -->
-      <div class="mat-tiptap-editor-container">
-        <div
-          tiptap
-          [editor]="editor"
-          [outputFormat]="config.outputFormat || 'html'"
-          class="mat-tiptap-editor"
-          [class.readonly]="!config.editable"
-          (contentChange)="onContentChange($event)"
-        ></div>
-      </div>
-    </div>
+    <div
+      #editorElement
+      [id]="id"
+      [attr.aria-describedby]="describedBy"
+      [attr.aria-required]="required"
+      [attr.aria-disabled]="disabled"
+      class="tiptap-editor"
+      (focusin)="onFocusIn()"
+      (focusout)="onFocusOut($event)"
+    ></div>
+    <ng-content />
   `,
-  styles: [
-    `
-      .mat-tiptap-container {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      .mat-tiptap-editor-container {
-        padding: 16px;
-        min-height: 200px;
-      }
-
-      .mat-tiptap-editor {
-        outline: none;
-        min-height: 180px;
-      }
-
-      .mat-tiptap-editor.readonly {
-        background-color: #f5f5f5;
-        cursor: not-allowed;
-      }
-
-      /* TipTap Editor Styles */
-      .mat-tiptap-editor .ProseMirror {
-        outline: none;
-        font-family: 'Roboto', sans-serif;
-        font-size: 14px;
-        line-height: 1.6;
-        color: rgba(0, 0, 0, 0.87);
-      }
-
-      .mat-tiptap-editor .ProseMirror h1,
-      .mat-tiptap-editor .ProseMirror h2,
-      .mat-tiptap-editor .ProseMirror h3 {
-        margin: 16px 0 8px 0;
-        font-weight: 500;
-        color: rgba(0, 0, 0, 0.87);
-      }
-
-      .mat-tiptap-editor .ProseMirror h1 {
-        font-size: 24px;
-      }
-
-      .mat-tiptap-editor .ProseMirror h2 {
-        font-size: 20px;
-      }
-
-      .mat-tiptap-editor .ProseMirror h3 {
-        font-size: 18px;
-      }
-
-      .mat-tiptap-editor .ProseMirror p {
-        margin: 8px 0;
-      }
-
-      .mat-tiptap-editor .ProseMirror ul,
-      .mat-tiptap-editor .ProseMirror ol {
-        margin: 8px 0;
-        padding-left: 24px;
-      }
-
-      .mat-tiptap-editor .ProseMirror li {
-        margin: 4px 0;
-      }
-
-      .mat-tiptap-editor .ProseMirror blockquote {
-        border-left: 4px solid #3f51b5;
-        margin: 16px 0;
-        padding-left: 16px;
-        color: rgba(0, 0, 0, 0.6);
-        font-style: italic;
-      }
-
-      .mat-tiptap-editor .ProseMirror code {
-        background-color: #f5f5f5;
-        padding: 2px 4px;
-        border-radius: 4px;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 13px;
-      }
-
-      .mat-tiptap-editor .ProseMirror pre {
-        background-color: #f5f5f5;
-        padding: 16px;
-        border-radius: 4px;
-        overflow-x: auto;
-        margin: 16px 0;
-      }
-
-      .mat-tiptap-editor .ProseMirror pre code {
-        background-color: transparent;
-        padding: 0;
-      }
-
-      .mat-tiptap-editor .ProseMirror a {
-        color: #3f51b5;
-        text-decoration: none;
-      }
-
-      .mat-tiptap-editor .ProseMirror a:hover {
-        text-decoration: underline;
-      }
-
-      /* Placeholder styles */
-      .mat-tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
-        content: attr(data-placeholder);
-        float: left;
-        color: rgba(0, 0, 0, 0.38);
-        pointer-events: none;
-        height: 0;
-      }
-    `,
-  ],
-})
-export class NgxMatTiptap implements OnInit {
-  @Input() config: NgxMatTiptapConfig = {
-    placeholder: 'Start typing...',
-    editable: true,
-  };
-
-  @Input() content: string | object = '';
-  @Output() contentChange = new EventEmitter<string | object>();
-
-  editor = new Editor({
-    extensions: [StarterKit as any],
-    onUpdate: ({ editor }) => {
-      const output =
-        this.config.outputFormat === 'json'
-          ? editor.getJSON()
-          : editor.getHTML();
-      this.contentChange.emit(output);
-    },
-  });
-
-  ngOnInit() {
-    if (this.content) {
-      this.editor.commands.setContent(this.content);
+  styles: [`
+    .tiptap-editor {
+      min-height: 100px;
+      border: none;
+      outline: none;
+      padding: 8px;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: 1.5;
+      resize: vertical;
     }
-    this.editor.setEditable(this.config.editable ?? true);
+    
+    .tiptap-editor:focus {
+      outline: none;
+    }
+    
+    .tiptap-editor p {
+      margin: 0 0 8px 0;
+    }
+    
+    .tiptap-editor p:last-child {
+      margin-bottom: 0;
+    }
+  `],
+  providers: [
+    {
+      provide: MatFormFieldControl,
+      useExisting: NgxMatTiptap
+    }
+  ]
+})
+export class NgxMatTiptap implements MatFormFieldControl<any>, ControlValueAccessor, OnDestroy, OnInit {
+  static nextId = 0;
+
+  editorElement = viewChild<ElementRef<HTMLDivElement>>('editorElement');
+  
+  placeholderInput = input('');
+  requiredInput = input(false);
+  disabledInput = input(false);
+  valueInput = input<any>('');
+
+  // Internal writable signals for state management
+  private _value = signal<any>('');
+  private _disabled = signal(false);
+  private editor: Editor | null = null;
+
+  stateChanges = new Subject<void>();
+  focused = false;
+  touched = false;
+  controlType = 'ngx-mat-tiptap';
+  id = `ngx-mat-tiptap-${NgxMatTiptap.nextId++}`;
+  describedBy = '';
+
+  onChange = (_: any) => {};
+  onTouched = () => {};
+
+  // Properties to satisfy MatFormFieldControl interface
+  get placeholder(): string {
+    return this.placeholderInput();
   }
 
-  onContentChange(content: any) {
-    this.contentChange.emit(content);
+  get required(): boolean {
+    return this.requiredInput();
+  }
+
+  get disabled(): boolean {
+    return this._disabled();
+  }
+
+  get value(): any {
+    return this._value();
+  }
+
+  constructor(
+    @Optional() @Self() public ngControl: NgControl,
+    private _elementRef: ElementRef<HTMLElement>,
+    private _ngZone: NgZone
+  ) {
+    if (this.ngControl != null) {
+      this.ngControl.valueAccessor = this;
+    }
+  }
+
+  ngOnInit() {
+    this.initEditor();
+  }
+
+  ngOnDestroy() {
+    this.stateChanges.complete();
+    if (this.editor) {
+      this.editor.destroy();
+    }
+  }
+
+  private initEditor() {
+    const element = this.editorElement();
+    if (!element) return;
+
+    this.editor = new Editor({
+      element: element.nativeElement,
+      extensions: [StarterKit],
+      content: this.value || '',
+      editable: !this.disabled,
+      onUpdate: ({ editor }) => {
+        const html = editor.getHTML();
+        this._value.set(html);
+        this.onChange(html);
+        this.stateChanges.next();
+      },
+      onFocus: () => {
+        this.onFocusIn();
+      },
+      onBlur: () => {
+        this.onFocusOut(new FocusEvent('blur'));
+      }
+    });
+  }
+
+  onContainerClick(event: MouseEvent) {
+    if ((event.target as Element).tagName.toLowerCase() !== 'div') {
+      this.editor?.commands.focus();
+    }
+  }
+
+  setDescribedByIds(ids: string[]) {
+    this.describedBy = ids.join(' ');
+  }
+
+  onFocusIn() {
+    if (!this.focused) {
+      this.focused = true;
+      this.stateChanges.next();
+    }
+  }
+
+  onFocusOut(event: FocusEvent) {
+    if (!this._elementRef.nativeElement.contains(event.relatedTarget as Element)) {
+      this.touched = true;
+      this.focused = false;
+      this.onTouched();
+      this.stateChanges.next();
+    }
+  }
+
+  autoFocusNext(control: NgControl, event: KeyboardEvent): void {
+    // Implementation for auto-focusing next control
+  }
+
+  autoFocusPrev(control: NgControl, event: KeyboardEvent): void {
+    // Implementation for auto-focusing previous control
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this._disabled.set(isDisabled);
+    if (this.editor) {
+      this.editor.setEditable(!isDisabled);
+    }
+    this.stateChanges.next();
+  }
+
+  writeValue(value: any): void {
+    this._value.set(value);
+    if (this.editor && value !== this.editor.getHTML()) {
+      this.editor.commands.setContent(value || '');
+    }
+    this.stateChanges.next();
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  get empty(): boolean {
+    return !this.value || this.value.length === 0 || this.value === '<p></p>';
+  }
+
+  get shouldLabelFloat(): boolean {
+    return this.focused || !this.empty;
+  }
+
+  get errorState(): boolean {
+    return this.ngControl ? !!(this.ngControl.invalid && this.ngControl.touched) : false;
   }
 }
