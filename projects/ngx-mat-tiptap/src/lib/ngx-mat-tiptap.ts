@@ -1,4 +1,15 @@
-import { Component, ElementRef, input, signal, NgZone, OnDestroy, Optional, Self, viewChild, ViewChild, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  input,
+  signal,
+  NgZone,
+  OnDestroy,
+  viewChild,
+  OnInit,
+  inject,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { Subject } from 'rxjs';
@@ -19,48 +30,49 @@ import StarterKit from '@tiptap/starter-kit';
       (focusin)="onFocusIn()"
       (focusout)="onFocusOut($event)"
     ></div>
-    <ng-content />
   `,
-  styles: [`
+  styles: `
+    .ngx-mat-tiptap {
+      display: block;
+    }
+
     .tiptap-editor {
-      min-height: 100px;
-      border: none;
-      outline: none;
-      padding: 8px;
-      font-family: inherit;
-      font-size: inherit;
-      line-height: 1.5;
-      resize: vertical;
+      width: 100%;
+
+      .tiptap.ProseMirror {
+        p {
+          margin: 0;
+        }
+      }
     }
-    
-    .tiptap-editor:focus {
-      outline: none;
-    }
-    
-    .tiptap-editor p {
-      margin: 0 0 8px 0;
-    }
-    
-    .tiptap-editor p:last-child {
-      margin-bottom: 0;
-    }
-  `],
+  `,
   providers: [
     {
       provide: MatFormFieldControl,
-      useExisting: NgxMatTiptap
-    }
-  ]
+      useExisting: NgxMatTiptap,
+    },
+  ],
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    class: 'ngx-mat-tiptap',
+  },
 })
-export class NgxMatTiptap implements MatFormFieldControl<any>, ControlValueAccessor, OnDestroy, OnInit {
+export class NgxMatTiptap
+  implements MatFormFieldControl<any>, ControlValueAccessor, OnDestroy, OnInit
+{
   static nextId = 0;
 
   editorElement = viewChild<ElementRef<HTMLDivElement>>('editorElement');
-  
+
   placeholderInput = input('');
   requiredInput = input(false);
   disabledInput = input(false);
   valueInput = input<any>('');
+
+  // Injected dependencies
+  public ngControl: NgControl | null = null;
+  private _elementRef!: ElementRef<HTMLElement>;
+  private _ngZone!: NgZone;
 
   // Internal writable signals for state management
   private _value = signal<any>('');
@@ -94,11 +106,15 @@ export class NgxMatTiptap implements MatFormFieldControl<any>, ControlValueAcces
     return this._value();
   }
 
-  constructor(
-    @Optional() @Self() public ngControl: NgControl,
-    private _elementRef: ElementRef<HTMLElement>,
-    private _ngZone: NgZone
-  ) {
+  constructor() {
+    const ngControl = inject(NgControl, { optional: true, self: true });
+    const _elementRef = inject(ElementRef<HTMLElement>);
+    const _ngZone = inject(NgZone);
+
+    this.ngControl = ngControl;
+    this._elementRef = _elementRef;
+    this._ngZone = _ngZone;
+
     if (this.ngControl != null) {
       this.ngControl.valueAccessor = this;
     }
@@ -135,7 +151,7 @@ export class NgxMatTiptap implements MatFormFieldControl<any>, ControlValueAcces
       },
       onBlur: () => {
         this.onFocusOut(new FocusEvent('blur'));
-      }
+      },
     });
   }
 
@@ -157,7 +173,9 @@ export class NgxMatTiptap implements MatFormFieldControl<any>, ControlValueAcces
   }
 
   onFocusOut(event: FocusEvent) {
-    if (!this._elementRef.nativeElement.contains(event.relatedTarget as Element)) {
+    if (
+      !this._elementRef.nativeElement.contains(event.relatedTarget as Element)
+    ) {
       this.touched = true;
       this.focused = false;
       this.onTouched();
@@ -206,6 +224,8 @@ export class NgxMatTiptap implements MatFormFieldControl<any>, ControlValueAcces
   }
 
   get errorState(): boolean {
-    return this.ngControl ? !!(this.ngControl.invalid && this.ngControl.touched) : false;
+    return this.ngControl
+      ? !!(this.ngControl.invalid && this.ngControl.touched)
+      : false;
   }
 }

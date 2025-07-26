@@ -26,49 +26,24 @@
   width: 100%;
 }
 
-.tiptap-editor {
-  width: 100%;
-
-  ::ng-deep .mat-form-field-infix {
-    padding: 0;
-    border-top: none;
-  }
-
-  ::ng-deep .mat-form-field-wrapper {
-    padding-bottom: 0;
-  }
-
-  ::ng-deep ngx-mat-tiptap {
-    display: block;
-    width: 100%;
-  }
-}
-
 .value-display {
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 4px;
-}
 
-.value-display pre {
-  margin: 0;
-  padding: 0.5rem;
-  border-radius: 3px;
-  font-size: 12px;
-  line-height: 1.4;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
+  pre {
+    margin: 0;
+    padding: 0.5rem;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
 
-.value-display code {
-  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-  color: #333;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem;
+  code {
+    font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+    color: #333;
+  }
 }
