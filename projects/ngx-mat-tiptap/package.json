@@ -1,15 +1,15 @@
 {
-  "name": "ngx-mat-tiptap",
-  "version": "0.0.1",
+  "name": "@felixdulfer/ngx-mat-tiptap",
+  "version": "0.1.0",
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0",
     "@angular/forms": "^20.1.0",
-    "@angular/material": "^20.1.0"
+    "@angular/material": "^20.1.0",
+    "@tiptap/core": "^2.26.1",
+    "@tiptap/starter-kit": "^2.26.1"
   },
   "dependencies": {
-    "@tiptap/core": "^2.26.1",
-    "@tiptap/starter-kit": "^2.26.1",
     "tslib": "^2.3.0"
   },
   "sideEffects": false
