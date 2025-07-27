@@ -61,13 +61,13 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Check if conventional-recommended-bump is installed
-if ! npm list -g conventional-recommended-bump > /dev/null 2>&1; then
+if ! command -v conventional-recommended-bump > /dev/null 2>&1; then
     print_status "Installing conventional-recommended-bump globally..."
     npm install -g conventional-recommended-bump
 fi
 
 # Check if conventional-changelog-cli is installed
-if ! npm list -g conventional-changelog-cli > /dev/null 2>&1; then
+if ! command -v conventional-changelog > /dev/null 2>&1; then
     print_status "Installing conventional-changelog-cli globally..."
     npm install -g conventional-changelog-cli
 fi
