@@ -1,6 +1,10 @@
 {
   "name": "@felixdulfer/ngx-mat-tiptap",
   "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/felixdulfer/ngx-mat-tiptap.git"
+  },
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0",
