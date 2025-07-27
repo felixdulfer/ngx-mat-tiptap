@@ -1,63 +1,145 @@
-# NgxMatTiptap
+# @felixdulfer/ngx-mat-tiptap
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
+A rich text editor component for Angular Material applications built with TipTap.
 
-## Code scaffolding
+## Installation
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+First, install the required peer dependencies:
 
 ```bash
-ng generate --help
+npm install @tiptap/core @tiptap/starter-kit
 ```
 
-## Building
-
-To build the library, run:
+Then install the component:
 
 ```bash
-ng build ngx-mat-tiptap
+npm install @felixdulfer/ngx-mat-tiptap
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+## Basic Usage
 
-### Publishing the Library
+### 1. Import the Component
 
-Once the project is built, you can publish your library by following these steps:
-
-1. Navigate to the `dist` directory:
-   ```bash
-   cd dist/ngx-mat-tiptap
-   ```
-
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
+```typescript
+import { NgxMatTiptap } from "@felixdulfer/ngx-mat-tiptap";
 ```
 
-## Running end-to-end tests
+### 2. Use in Template
 
-For end-to-end (e2e) testing, run:
+The editor does work stand-alone, but if this is what you are after, then better use ngx-tiptap instead.
 
-```bash
-ng e2e
+```html
+<ngx-mat-tiptap [(ngModel)]="content" />
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### 3. With Angular Material Form Field
 
-## Additional Resources
+```html
+<mat-form-field appearance="outline">
+  <ngx-mat-tiptap formControlName="editorContent" />
+  <mat-label>Rich Text Editor</mat-label>
+</mat-form-field>
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Complete Example
+
+```typescript
+import { Component } from "@angular/core";
+import { FormGroup, FormControl, ReactiveFormsModule } from "@angular/forms";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { NgxMatTiptap } from "@felixdulfer/ngx-mat-tiptap";
+import { JsonPipe } from "@angular/common";
+
+@Component({
+  selector: "app-editor",
+  standalone: true,
+  imports: [ReactiveFormsModule, MatFormFieldModule, NgxMatTiptap, JsonPipe],
+  template: `
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline">
+        <ngx-mat-tiptap formControlName="content" />
+        <mat-label>Rich Text Editor</mat-label>
+      </mat-form-field>
+    </form>
+
+    <div>
+      <h3>Editor Content:</h3>
+      <pre>{{ form.get("content")?.value | json }}</pre>
+    </div>
+  `,
+})
+export class EditorComponent {
+  form = new FormGroup({
+    content: new FormControl({
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "Hello, this is a rich text editor!",
+            },
+          ],
+        },
+      ],
+    }),
+  });
+}
+```
+
+## Available Features
+
+The editor includes the following formatting options:
+
+- **Bold** - `Ctrl+B` or toolbar button
+- **Italic** - `Ctrl+I` or toolbar button
+- **Bullet Lists** - Toolbar button
+
+## Content Format
+
+The editor uses TipTap's JSON format for content. The content structure follows the ProseMirror schema:
+
+```typescript
+{
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'Your text content here'
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Styling
+
+The component includes built-in Material Design styling. You can customize the appearance by overriding CSS variables:
+
+```scss
+.ngx-mat-tiptap {
+  --tiptap-editor-border-color: #e0e0e0;
+  --tiptap-toolbar-background: #fafafa;
+  --tiptap-button-active-color: #1976d2;
+}
+```
+
+## Requirements
+
+- Angular 20.1.0 or higher
+- Angular Material 20.1.0 or higher
+- TipTap Core 2.26.1 or higher
+- TipTap Starter Kit 2.26.1 or higher
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
