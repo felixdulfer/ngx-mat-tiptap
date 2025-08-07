@@ -72,9 +72,9 @@ if ! command -v conventional-changelog > /dev/null 2>&1; then
     npm install -g conventional-changelog-cli
 fi
 
-# Check if conventional-changelog-angular is installed
-if ! npm list -g conventional-changelog-angular > /dev/null 2>&1; then
-    print_status "Installing conventional-changelog-angular globally..."
+# Check if conventional-changelog-angular preset is available
+if ! conventional-changelog --preset angular --dry-run > /dev/null 2>&1; then
+    print_status "Installing conventional-changelog-angular preset..."
     npm install -g conventional-changelog-angular
 fi
 
