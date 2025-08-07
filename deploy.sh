@@ -60,31 +60,13 @@ if [ ! -d "node_modules" ]; then
     npm install
 fi
 
-# Check if conventional-recommended-bump is installed
-if ! command -v conventional-recommended-bump > /dev/null 2>&1; then
-    print_status "Installing conventional-recommended-bump globally..."
-    npm install -g conventional-recommended-bump
-fi
-
-# Check if conventional-changelog-cli is installed
-if ! command -v conventional-changelog > /dev/null 2>&1; then
-    print_status "Installing conventional-changelog-cli globally..."
-    npm install -g conventional-changelog-cli
-fi
-
-# Install conventional-changelog-angular locally if not available
-if ! npm list conventional-changelog-angular > /dev/null 2>&1; then
-    print_status "Installing conventional-changelog-angular locally..."
-    npm install --save-dev conventional-changelog-angular
-fi
-
 # Get current version
 CURRENT_VERSION=$(node -p "require('./projects/ngx-mat-tiptap/package.json').version")
 print_status "Current version: $CURRENT_VERSION"
 
 # Determine the recommended version bump
 print_status "Determining version bump based on conventional commits..."
-RECOMMENDED_BUMP=$(conventional-recommended-bump -p angular)
+RECOMMENDED_BUMP=$(npx conventional-recommended-bump -p angular)
 
 if [ -z "$RECOMMENDED_BUMP" ]; then
     print_warning "No conventional commits found. Using patch bump."
