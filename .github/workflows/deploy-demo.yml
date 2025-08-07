@@ -8,10 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,13 +26,6 @@ jobs:
 
       - name: Build demo app
         run: npm run build:demo
-
-      - name: Check build output
-        run: |
-          echo "Build output structure:"
-          find dist -type d | head -20
-          echo "Demo build output:"
-          ls -la dist/demo/ || echo "dist/demo not found"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
