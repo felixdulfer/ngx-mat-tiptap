@@ -139,7 +139,7 @@ import { MatDividerModule } from '@angular/material/divider';
       display: flex !important;
       gap: 4px;
       margin-top: 4px;
-      padding: 0px 0.5rem;
+      padding: 0px 0.5rem 4px 0.5rem;
       background: white;
 
       .toolbar-btn {
