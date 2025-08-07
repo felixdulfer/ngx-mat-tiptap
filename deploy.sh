@@ -72,6 +72,12 @@ if ! command -v conventional-changelog > /dev/null 2>&1; then
     npm install -g conventional-changelog-cli
 fi
 
+# Check if conventional-changelog-angular is installed
+if ! npm list -g conventional-changelog-angular > /dev/null 2>&1; then
+    print_status "Installing conventional-changelog-angular globally..."
+    npm install -g conventional-changelog-angular
+fi
+
 # Get current version
 CURRENT_VERSION=$(node -p "require('./projects/ngx-mat-tiptap/package.json').version")
 print_status "Current version: $CURRENT_VERSION"
@@ -159,4 +165,4 @@ git push origin "v$NEW_VERSION"
 
 print_success "Deployment completed successfully!"
 print_success "Package published: @felixdulfer/ngx-mat-tiptap@$NEW_VERSION"
-print_success "Git tag created and pushed: v$NEW_VERSION" 
+print_success "Git tag created and pushed: v$NEW_VERSION"
