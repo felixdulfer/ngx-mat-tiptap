@@ -24,53 +24,55 @@ import { MatDividerModule } from '@angular/material/divider';
   standalone: true,
   imports: [MatIconModule, MatButtonModule, MatDividerModule],
   template: `
-    <div
-      #editorElement
-      [id]="id"
-      [attr.aria-describedby]="describedBy"
-      [attr.aria-required]="required"
-      [attr.aria-disabled]="disabled"
-      class="tiptap-editor"
-      (focusin)="onFocusIn()"
-      (focusout)="onFocusOut($event)"
-    ></div>
-    <div class="expander" [class.expanded]="!empty">
-      <div class="expander-content">
-        <mat-divider class="divider" />
-        <div class="tiptap-toolbar">
-          <button
-            matIconButton
-            type="button"
-            class="toolbar-btn"
-            [class.active]="isBoldActive()"
-            (click)="toggleBold()"
-            [disabled]="disabled"
-            title="Bold"
-          >
-            <mat-icon>format_bold</mat-icon>
-          </button>
-          <button
-            matIconButton
-            type="button"
-            class="toolbar-btn"
-            [class.active]="isItalicActive()"
-            (click)="toggleItalic()"
-            [disabled]="disabled"
-            title="Italic"
-          >
-            <mat-icon>format_italic</mat-icon>
-          </button>
-          <button
-            matIconButton
-            type="button"
-            class="toolbar-btn"
-            [class.active]="isBulletListActive()"
-            (click)="toggleBulletList()"
-            [disabled]="disabled"
-            title="Bullet List"
-          >
-            <mat-icon>format_list_bulleted</mat-icon>
-          </button>
+    <div class="editor-container">
+      <div
+        #editorElement
+        [id]="id"
+        [attr.aria-describedby]="describedBy"
+        [attr.aria-required]="required"
+        [attr.aria-disabled]="disabled"
+        class="tiptap-editor"
+        (focusin)="onFocusIn()"
+        (focusout)="onFocusOut($event)"
+      ></div>
+      <div class="expander" [class.expanded]="!empty">
+        <div class="expander-content">
+          <mat-divider class="divider" />
+          <div class="tiptap-toolbar">
+            <button
+              matIconButton
+              type="button"
+              class="toolbar-btn"
+              [class.active]="isBoldActive()"
+              (click)="toggleBold()"
+              [disabled]="disabled"
+              title="Bold"
+            >
+              <mat-icon>format_bold</mat-icon>
+            </button>
+            <button
+              matIconButton
+              type="button"
+              class="toolbar-btn"
+              [class.active]="isItalicActive()"
+              (click)="toggleItalic()"
+              [disabled]="disabled"
+              title="Italic"
+            >
+              <mat-icon>format_italic</mat-icon>
+            </button>
+            <button
+              matIconButton
+              type="button"
+              class="toolbar-btn"
+              [class.active]="isBulletListActive()"
+              (click)="toggleBulletList()"
+              [disabled]="disabled"
+              title="Bullet List"
+            >
+              <mat-icon>format_list_bulleted</mat-icon>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -82,8 +84,15 @@ import { MatDividerModule } from '@angular/material/divider';
       margin: 0 -1rem;
     }
 
+    .editor-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
     .tiptap-editor {
       width: 100%;
+      flex: 1;
 
       .tiptap.ProseMirror {
         padding: 0 1rem;
@@ -107,6 +116,9 @@ import { MatDividerModule } from '@angular/material/divider';
       grid-template-rows: 0fr;
       overflow: hidden;
       transition: grid-template-rows 0.2s;
+      position: sticky;
+      bottom: 0;
+      background: white;
     }
 
     .expander-content {
@@ -127,7 +139,8 @@ import { MatDividerModule } from '@angular/material/divider';
       display: flex !important;
       gap: 4px;
       margin-top: 4px;
-      padding: 0 8px;
+      padding: 0px 0.5rem;
+      background: white;
 
       .toolbar-btn {
         --mat-icon-button-container-shape: 12px;
@@ -237,6 +250,8 @@ export class NgxMatTiptap
       this.editor.destroy();
     }
   }
+
+
 
   private initEditor() {
     const element = this.editorElement();
