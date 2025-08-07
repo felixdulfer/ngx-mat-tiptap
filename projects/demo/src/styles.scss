@@ -12,3 +12,8 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+/* Import the library's global styles */
+@import "../../ngx-mat-tiptap/src/styles.css";
+
+/* Additional demo-specific styles can go here */

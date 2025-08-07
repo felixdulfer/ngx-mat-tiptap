@@ -36,9 +36,7 @@ import { MatDividerModule } from '@angular/material/divider';
     ></div>
     <div class="expander" [class.expanded]="!empty">
       <div class="expander-content">
-        <div class="divider-spacer"></div>
         <mat-divider class="divider" />
-        <div class="divider-spacer"></div>
         <div class="tiptap-toolbar">
           <button
             matIconButton
@@ -81,12 +79,14 @@ import { MatDividerModule } from '@angular/material/divider';
     .ngx-mat-tiptap {
       display: block;
       position: relative;
+      margin: 0 -1rem;
     }
 
     .tiptap-editor {
       width: 100%;
 
       .tiptap.ProseMirror {
+        padding: 0 1rem;
         outline: 0;
         p {
           margin: 0;
@@ -95,13 +95,11 @@ import { MatDividerModule } from '@angular/material/divider';
     }
 
     .divider-spacer {
-      height: 0.5rem;
     }
 
     mat-divider.divider {
-      position: absolute;
-      width: calc(100% + 32px);
-      left: -16px;
+      margin: 0.75rem 0 0 0;
+      opacity: 0.3;
     }
 
     .expander {
@@ -127,13 +125,14 @@ import { MatDividerModule } from '@angular/material/divider';
 
     .tiptap-toolbar {
       display: flex !important;
-      gap: 2px;
-      margin-top: 8px;
-      /*  position: absolute; */
+      gap: 4px;
+      margin-top: 4px;
+      padding: 0 8px;
 
       .toolbar-btn {
         --mat-icon-button-container-shape: 12px;
-        /* border: 1px solid var(--mat-sys-outline-variant); */
+        --mat-icon-button-state-layer-size: 32px;
+        --mat-icon-button-icon-size: 24px;
 
         &.active {
           background-color: var(--mat-sys-primary);
@@ -144,6 +143,7 @@ import { MatDividerModule } from '@angular/material/divider';
           width: 20px;
           height: 20px;
         }
+
         .mat-icon {
           width: unset;
           height: unset;

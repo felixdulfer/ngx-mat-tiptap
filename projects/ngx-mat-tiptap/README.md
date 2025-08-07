@@ -24,7 +24,15 @@ npm install @felixdulfer/ngx-mat-tiptap
 import { NgxMatTiptap } from "@felixdulfer/ngx-mat-tiptap";
 ```
 
-### 2. Use in Template
+### 2. Import the Styles (Optional)
+
+If you need the custom form field styling, import the global styles:
+
+```scss
+@import "@felixdulfer/ngx-mat-tiptap/styles.css";
+```
+
+### 3. Use in Template
 
 The editor does work stand-alone, but if this is what you are after, then better use ngx-tiptap instead.
 
@@ -32,7 +40,7 @@ The editor does work stand-alone, but if this is what you are after, then better
 <ngx-mat-tiptap [(ngModel)]="content" />
 ```
 
-### 3. With Angular Material Form Field
+### 4. With Angular Material Form Field
 
 ```html
 <mat-form-field appearance="outline">
@@ -126,6 +134,24 @@ The component includes built-in Material Design styling. You can customize the a
   --tiptap-editor-border-color: #e0e0e0;
   --tiptap-toolbar-background: #fafafa;
   --tiptap-button-active-color: #1976d2;
+}
+```
+
+### Global Styles
+
+The library provides global styles that can be imported manually in your main styles file:
+
+```scss
+@import "@felixdulfer/ngx-mat-tiptap/styles.css";
+```
+
+Or in your `angular.json`:
+
+```json
+{
+  "styles": [
+    "node_modules/@felixdulfer/ngx-mat-tiptap/styles.css"
+  ]
 }
 ```
 

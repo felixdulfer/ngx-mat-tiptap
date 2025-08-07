@@ -3,5 +3,12 @@
   "dest": "../../dist/ngx-mat-tiptap",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": [
+    {
+      "glob": "styles.css",
+      "input": "src/",
+      "output": "./"
+    }
+  ]
 }

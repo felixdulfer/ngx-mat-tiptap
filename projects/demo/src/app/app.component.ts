@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -9,7 +9,8 @@ import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { NgxMatTiptap } from 'ngx-mat-tiptap';
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from 'ngx-mat-tiptap';
+import { MatIconRegistry } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
@@ -23,9 +24,13 @@ import { NgxMatTiptap } from 'ngx-mat-tiptap';
     MatFormFieldModule,
     MatInputModule,
     NgxMatTiptap,
+    NgxMatTipTapFormFieldDirective,
   ],
 })
 export class AppComponent {
+
+  matIconReg = inject(MatIconRegistry);
+
   form: FormGroup = new FormGroup({
     tiptapContent: new FormControl(
       {
@@ -55,4 +60,9 @@ export class AppComponent {
       console.log('Form values changed:', values);
     });
   }
+
+  ngOnInit(): void {
+    this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
+  }
+
 }
