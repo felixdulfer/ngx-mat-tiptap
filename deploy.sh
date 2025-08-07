@@ -84,7 +84,7 @@ print_status "Current version: $CURRENT_VERSION"
 
 # Determine the recommended version bump
 print_status "Determining version bump based on conventional commits..."
-RECOMMENDED_BUMP=$(conventional-recommended-bump -p angular --preset ./node_modules/conventional-changelog-angular)
+RECOMMENDED_BUMP=$(conventional-recommended-bump -p angular)
 
 if [ -z "$RECOMMENDED_BUMP" ]; then
     print_warning "No conventional commits found. Using patch bump."
