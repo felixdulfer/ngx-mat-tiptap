@@ -3,11 +3,12 @@ name: Deploy PR Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
-  permissions:
-    contents: write
-    pages: write
-    id-token: write
-    pull-requests: write
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  pull-requests: write
 
 jobs:
   deploy-preview:
