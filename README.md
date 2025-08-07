@@ -18,10 +18,10 @@ npm install @felixdulfer/ngx-mat-tiptap
 
 ## Basic Usage
 
-### 1. Import the Component
+### 1. Import the Component and Directive
 
 ```typescript
-import { NgxMatTiptap } from '@felixdulfer/ngx-mat-tiptap';
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from '@felixdulfer/ngx-mat-tiptap';
 ```
 
 ### 2. Use in Template
@@ -33,8 +33,8 @@ import { NgxMatTiptap } from '@felixdulfer/ngx-mat-tiptap';
 ### 3. With Angular Material Form Field
 
 ```html
-<mat-form-field appearance="outline">
-  <ngx-mat-tiptap formControlName="editorContent"></ngx-mat-tiptap>
+<mat-form-field ngxMatTipTapFormField appearance="outline">
+  <ngx-mat-tiptap formControlName="editorContent" />
   <mat-label>Rich Text Editor</mat-label>
 </mat-form-field>
 ```
@@ -45,16 +45,16 @@ import { NgxMatTiptap } from '@felixdulfer/ngx-mat-tiptap';
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { NgxMatTiptap } from '@felixdulfer/ngx-mat-tiptap';
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from '@felixdulfer/ngx-mat-tiptap';
 
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormFieldModule, NgxMatTiptap],
+  imports: [ReactiveFormsModule, MatFormFieldModule, NgxMatTiptap, NgxMatTipTapFormFieldDirective],
   template: `
     <form [formGroup]="form">
-      <mat-form-field appearance="outline">
-        <ngx-mat-tiptap formControlName="content"></ngx-mat-tiptap>
+      <mat-form-field ngxMatTipTapFormField appearance="outline">
+        <ngx-mat-tiptap formControlName="content" />
         <mat-label>Rich Text Editor</mat-label>
       </mat-form-field>
     </form>
@@ -92,6 +92,21 @@ The editor includes the following formatting options:
 - **Bold** - `Ctrl+B` or toolbar button
 - **Italic** - `Ctrl+I` or toolbar button  
 - **Bullet Lists** - Toolbar button
+
+## Form Field Integration
+
+The library provides a directive `NgxMatTipTapFormFieldDirective` that can be applied to `mat-form-field` elements to ensure proper styling and behavior when using the TipTap editor within Angular Material form fields.
+
+### Usage
+
+```html
+<mat-form-field ngxMatTipTapFormField appearance="outline">
+  <ngx-mat-tiptap formControlName="content" />
+  <mat-label>Rich Text Editor</mat-label>
+</mat-form-field>
+```
+
+The directive automatically adds the CSS class `ngx-mat-tiptap-form-field` to the form field for proper styling integration.
 
 ## Content Format
 
