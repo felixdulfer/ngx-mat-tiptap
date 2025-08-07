@@ -27,7 +27,7 @@ import { NgxMatTiptap } from '@felixdulfer/ngx-mat-tiptap';
 ### 2. Use in Template
 
 ```html
-<ngx-mat-tiptap [(ngModel)]="content"></ngx-mat-tiptap>
+<ngx-mat-tiptap [(ngModel)]="content" />
 ```
 
 ### 3. With Angular Material Form Field
