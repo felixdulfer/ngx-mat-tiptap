@@ -85,7 +85,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
     .tiptap-editor {
       width: 100%;
-      
+
       .tiptap.ProseMirror {
         outline: 0;
         p {
@@ -110,17 +110,17 @@ import { MatDividerModule } from '@angular/material/divider';
       overflow: hidden;
       transition: grid-template-rows 0.2s;
     }
-    
+
     .expander-content {
       min-height: 0;
       transition: visibility 0.2s;
       visibility: hidden;
     }
-    
+
     .expander.expanded {
       grid-template-rows: 1fr;
     }
-    
+
     .expander.expanded .expander-content {
       visibility: visible;
     }
@@ -129,17 +129,17 @@ import { MatDividerModule } from '@angular/material/divider';
       display: flex !important;
       gap: 2px;
       margin-top: 8px;
-      // position: absolute;
+      /*  position: absolute; */
 
       .toolbar-btn {
         --mat-icon-button-container-shape: 12px;
-        // border: 1px solid var(--mat-sys-outline-variant);
+        /* border: 1px solid var(--mat-sys-outline-variant); */
 
         &.active {
           background-color: var(--mat-sys-primary);
           color: var(--mat-sys-on-primary);
         }
-        
+
         &.mat-mdc-icon-button .mat-mdc-button-touch-target {
           width: 20px;
           height: 20px;
