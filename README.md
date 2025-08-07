@@ -129,17 +129,7 @@ The editor uses TipTap's JSON format for content. The content structure follows 
 }
 ```
 
-## Styling
 
-The component includes built-in Material Design styling. You can customize the appearance by overriding CSS variables:
-
-```scss
-.ngx-mat-tiptap {
-  --tiptap-editor-border-color: #e0e0e0;
-  --tiptap-toolbar-background: #fafafa;
-  --tiptap-button-active-color: #1976d2;
-}
-```
 
 ## Requirements
 
