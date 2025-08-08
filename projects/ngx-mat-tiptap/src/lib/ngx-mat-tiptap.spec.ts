@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NgxMatTiptap } from './ngx-mat-tiptap';
+import { Editor } from '@tiptap/core';
+import { NgZone } from '@angular/core';
 
 function createMockEditor(options?: {
   isBoldActive?: boolean;
@@ -342,7 +344,7 @@ describe('NgxMatTiptap', () => {
     expect(mockEditor.setEditable).toHaveBeenCalledWith(true);
   });
 
-  it('should test setDisabledState when editor does not exist', () => {
+      it('should test setDisabledState when editor does not exist', () => {
     component.editor = null;
 
     component.setDisabledState(true);
@@ -350,5 +352,22 @@ describe('NgxMatTiptap', () => {
 
     component.setDisabledState(false);
     expect(component.disabled).toBe(false);
+  });
+
+    it('should test ngOnInit calls initEditor', () => {
+    const initEditorSpy = jest.spyOn(component as any, 'initEditor');
+
+    component.ngOnInit();
+
+    expect(initEditorSpy).toHaveBeenCalled();
+  });
+
+  it('should test initEditor when element is not available', () => {
+    // Mock the editorElement signal to return null
+    (component.editorElement as any).get = jest.fn().mockReturnValue(null);
+
+    (component as any).initEditor();
+
+    expect(component.editor).toBeNull();
   });
 });
