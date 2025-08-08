@@ -80,7 +80,7 @@ echo "$TEST_OUTPUT" | tail -20
 print_status "Debug: Extracting coverage from 'All files' line..."
 ALL_FILES_LINE=$(echo "$TEST_OUTPUT" | grep "All files")
 print_status "Debug: All files line: '$ALL_FILES_LINE'"
-COVERAGE_PERCENTAGE=$(echo "$ALL_FILES_LINE" | tr -s ' ' | cut -d' ' -f3 | sed 's/%//')
+COVERAGE_PERCENTAGE=$(echo "$ALL_FILES_LINE" | cut -d'|' -f2 | tr -d ' ' | sed 's/%//')
 print_status "Debug: Extracted coverage: '$COVERAGE_PERCENTAGE'"
 if [ -z "$COVERAGE_PERCENTAGE" ]; then
     print_warning "Could not extract coverage percentage, using default value"
