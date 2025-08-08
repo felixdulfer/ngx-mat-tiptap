@@ -66,14 +66,12 @@ if ! node -e "require.resolve('puppeteer')" >/dev/null 2>&1; then
   npm i -D puppeteer
 fi
 
-# Run unit tests with coverage in headless Chrome
+# Run unit tests with coverage using Jest
 print_status "Running unit tests with coverage..."
-export CHROME_BIN=$(node -e "console.log(require('puppeteer').executablePath())")
-# Run tests only for the library and capture coverage output
-TEST_OUTPUT=$(npx ng test ngx-mat-tiptap --browsers=ChromeHeadless --watch=false --code-coverage 2>&1)
+TEST_OUTPUT=$(npm run test:coverage 2>&1)
 print_success "Unit tests passed. Coverage report generated in coverage/."
 
-# Extract coverage percentage from test output
+# Extract coverage percentage from Jest output
 COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep -o "Statements.*: [0-9.]*%" | head -1 | grep -o "[0-9.]*%" | sed 's/%//')
 if [ -z "$COVERAGE_PERCENTAGE" ]; then
     print_warning "Could not extract coverage percentage, using default value"
