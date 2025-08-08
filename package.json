@@ -25,15 +25,16 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^20.1.0",
+    "@angular/animations": "20.1.6",
     "@angular/cdk": "^20.1.0",
-    "@angular/common": "^20.1.0",
-    "@angular/compiler": "^20.1.0",
-    "@angular/core": "^20.1.0",
-    "@angular/forms": "^20.1.0",
+    "@angular/common": "20.1.6",
+    "@angular/compiler": "20.1.6",
+    "@angular/core": "20.1.6",
+    "@angular/forms": "20.1.6",
     "@angular/material": "^20.1.0",
-    "@angular/platform-browser": "^20.1.0",
-    "@angular/router": "^20.1.0",
+    "@angular/platform-browser": "20.1.6",
+    "@angular/platform-browser-dynamic": "20.1.6",
+    "@angular/router": "20.1.6",
     "@tiptap/core": "^2.26.1",
     "@tiptap/starter-kit": "^2.26.1",
     "ngx-tiptap": "^13.0.0",
@@ -55,6 +56,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^20.1.0",
-    "typescript": "~5.8.2"
+    "puppeteer": "^24.16.0",
+    "typescript": "~5.8.2",
+    "zone.js": "^0.15.1"
   }
 }

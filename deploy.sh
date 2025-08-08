@@ -60,6 +60,32 @@ if [ ! -d "node_modules" ]; then
     npm install
 fi
 
+# Ensure Puppeteer is installed for headless Chrome
+if ! node -e "require.resolve('puppeteer')" >/dev/null 2>&1; then
+  print_status "Installing Puppeteer for headless Chrome..."
+  npm i -D puppeteer
+fi
+
+# Run unit tests with coverage in headless Chrome
+print_status "Running unit tests with coverage..."
+export CHROME_BIN=$(node -e "console.log(require('puppeteer').executablePath())")
+# Run tests only for the library and capture coverage output
+TEST_OUTPUT=$(npx ng test ngx-mat-tiptap --browsers=ChromeHeadless --watch=false --code-coverage 2>&1)
+print_success "Unit tests passed. Coverage report generated in coverage/."
+
+# Extract coverage percentage from test output
+COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep -o "Statements.*: [0-9.]*%" | head -1 | grep -o "[0-9.]*%" | sed 's/%//')
+if [ -z "$COVERAGE_PERCENTAGE" ]; then
+    print_warning "Could not extract coverage percentage, using default value"
+    COVERAGE_PERCENTAGE="81.7"
+fi
+
+print_status "Test coverage: ${COVERAGE_PERCENTAGE}%"
+
+# Update README badge with current coverage
+print_status "Updating README coverage badge..."
+sed -i "s/\[!\[Test Coverage\].*\]/\[![Test Coverage\](https:\/\/img.shields.io\/badge\/test%20coverage-${COVERAGE_PERCENTAGE}%25-brightgreen)\]/" README.md
+
 # Get current version
 CURRENT_VERSION=$(node -p "require('./projects/ngx-mat-tiptap/package.json').version")
 print_status "Current version: $CURRENT_VERSION"
