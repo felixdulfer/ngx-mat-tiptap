@@ -60,17 +60,9 @@ if [ ! -d "node_modules" ]; then
     npm install
 fi
 
-# Ensure Puppeteer is installed for headless Chrome
-if ! node -e "require.resolve('puppeteer')" >/dev/null 2>&1; then
-  print_status "Installing Puppeteer for headless Chrome..."
-  npm i -D puppeteer
-fi
-
-# Run unit tests with coverage in headless Chrome
+# Run unit tests with coverage
 print_status "Running unit tests with coverage..."
-export CHROME_BIN=$(node -e "console.log(require('puppeteer').executablePath())")
-# Run tests only for the library
-npx ng test ngx-mat-tiptap --browsers=ChromeHeadless --watch=false --code-coverage
+npm run test:coverage
 print_success "Unit tests passed. Coverage report generated in coverage/."
 
 # Get current version

@@ -276,7 +276,7 @@ export class NgxMatTiptap
       },
     });
 
-    console.log('Editor initialized:', this.editor);
+
   }
 
   onContainerClick(event: MouseEvent) {
@@ -378,7 +378,6 @@ export class NgxMatTiptap
   }
 
   toggleBold(): void {
-    console.log('Toggle bold clicked, editor:', this.editor);
     this.editor?.chain().focus().toggleBold().run();
   }
 
