@@ -10,33 +10,41 @@ function createMockEditor(options?: {
   isBulletListActive?: boolean;
   getJSONReturn?: any;
 }) {
-  const run = jest.fn();
-  const toggleBold = jest.fn().mockReturnValue({ run });
-  const toggleItalic = jest.fn().mockReturnValue({ run });
-  const toggleBulletList = jest.fn().mockReturnValue({ run });
+  const run = jasmine.createSpy('run');
+  const toggleBold = jasmine.createSpy('toggleBold').and.returnValue({ run });
+  const toggleItalic = jasmine
+    .createSpy('toggleItalic')
+    .and.returnValue({ run });
+  const toggleBulletList = jasmine
+    .createSpy('toggleBulletList')
+    .and.returnValue({ run });
   const focusChain = {
     toggleBold,
     toggleItalic,
     toggleBulletList,
     run,
   } as any;
-  const chain = jest.fn().mockReturnValue({
-    focus: jest.fn().mockReturnValue(focusChain),
+  const chain = jasmine.createSpy('chain').and.returnValue({
+    focus: jasmine.createSpy('focus').and.returnValue(focusChain),
   });
 
-  const setEditable = jest.fn();
-  const destroy = jest.fn();
-  const getJSON = jest.fn().mockReturnValue(options?.getJSONReturn ?? {});
+  const setEditable = jasmine.createSpy('setEditable');
+  const destroy = jasmine.createSpy('destroy');
+  const getJSON = jasmine
+    .createSpy('getJSON')
+    .and.returnValue(options?.getJSONReturn ?? {});
   const commands = {
-    setContent: jest.fn(),
-    focus: jest.fn(),
+    setContent: jasmine.createSpy('setContent'),
+    focus: jasmine.createSpy('commands.focus'),
   } as any;
-  const isActive = jest.fn().mockImplementation((name: string) => {
-    if (name === 'bold') return !!options?.isBoldActive;
-    if (name === 'italic') return !!options?.isItalicActive;
-    if (name === 'bulletList') return !!options?.isBulletListActive;
-    return false;
-  });
+  const isActive = jasmine
+    .createSpy('isActive')
+    .and.callFake((name: string) => {
+      if (name === 'bold') return !!options?.isBoldActive;
+      if (name === 'italic') return !!options?.isItalicActive;
+      if (name === 'bulletList') return !!options?.isBulletListActive;
+      return false;
+    });
 
   return {
     chain,
@@ -53,7 +61,7 @@ describe('NgxMatTiptap', () => {
   let fixture: ComponentFixture<NgxMatTiptap>;
 
   beforeEach(async () => {
-    jest.spyOn(NgxMatTiptap.prototype as any, 'initEditor').mockImplementation(() => {});
+    spyOn<any>(NgxMatTiptap.prototype as any, 'initEditor').and.callFake(() => {});
 
     await TestBed.configureTestingModule({
       imports: [NgxMatTiptap],
@@ -77,19 +85,17 @@ describe('NgxMatTiptap', () => {
     let emits = 0;
     const sub = component.stateChanges.subscribe(() => emits++);
     component.onFocusIn();
-    expect(component.focused).toBe(true);
+    expect(component.focused).toBeTrue();
     expect(emits).toBeGreaterThan(0);
 
     const before = emits;
     component.onFocusIn();
-    expect(component.focused).toBe(true);
-    // Should not emit again when already focused
+    expect(component.focused).toBeTrue();
     expect(emits).toBe(before);
     sub.unsubscribe();
   });
 
   it('onFocusOut should mark touched when focus leaves host', () => {
-    // Ensure focused first
     component.onFocusIn();
     const outsideEl = document.createElement('div');
     document.body.appendChild(outsideEl);
@@ -100,47 +106,39 @@ describe('NgxMatTiptap', () => {
 
     component.onFocusOut(fakeEvent);
 
-    expect(component.touched).toBe(true);
-    expect(component.focused).toBe(false);
+    expect(component.touched).toBeTrue();
+    expect(component.focused).toBeFalse();
     document.body.removeChild(outsideEl);
   });
 
   it('empty should reflect content structure', () => {
-    // undefined
     component.writeValue(undefined as any);
-    expect(component.empty).toBe(true);
+    expect(component.empty).toBeTrue();
 
-    // empty object
     component.writeValue({});
-    expect(component.empty).toBe(true);
+    expect(component.empty).toBeTrue();
 
-    // content: []
     component.writeValue({ content: [] });
-    expect(component.empty).toBe(true);
+    expect(component.empty).toBeTrue();
 
-    // single empty paragraph
     component.writeValue({ content: [{ type: 'paragraph', content: [] }] });
-    expect(component.empty).toBe(true);
+    expect(component.empty).toBeTrue();
 
-    // non-empty paragraph
     component.writeValue({
       content: [
         { type: 'paragraph', content: [{ type: 'text', text: 'hi' }] },
       ],
     });
-    expect(component.empty).toBe(false);
+    expect(component.empty).toBeFalse();
   });
 
   it('shouldLabelFloat should be true when focused or not empty', () => {
-    // not focused and empty
     component.writeValue({});
-    expect(component.shouldLabelFloat).toBe(false);
+    expect(component.shouldLabelFloat).toBeFalse();
 
-    // focused
     component.onFocusIn();
-    expect(component.shouldLabelFloat).toBe(true);
+    expect(component.shouldLabelFloat).toBeTrue();
 
-    // unfocused but not empty
     const outsideEl = document.createElement('div');
     const fakeEvent = { relatedTarget: outsideEl } as unknown as FocusEvent;
     component.onFocusOut(fakeEvent);
@@ -149,18 +147,18 @@ describe('NgxMatTiptap', () => {
         { type: 'paragraph', content: [{ type: 'text', text: 'x' }] },
       ],
     });
-    expect(component.shouldLabelFloat).toBe(true);
+    expect(component.shouldLabelFloat).toBeTrue();
   });
 
   it('errorState should depend on ngControl validity and touched', () => {
     (component as any).ngControl = { invalid: true, touched: true } as any;
-    expect(component.errorState).toBe(true);
+    expect(component.errorState).toBeTrue();
 
     (component as any).ngControl = { invalid: false, touched: true } as any;
-    expect(component.errorState).toBe(false);
+    expect(component.errorState).toBeFalse();
 
     (component as any).ngControl = null;
-    expect(component.errorState).toBe(false);
+    expect(component.errorState).toBeFalse();
   });
 
   it('setDisabledState should update internal state and editor editable', () => {
@@ -171,11 +169,11 @@ describe('NgxMatTiptap', () => {
     const sub = component.stateChanges.subscribe(() => emits++);
 
     component.setDisabledState(true);
-    expect(component.disabled).toBe(true);
+    expect(component.disabled).toBeTrue();
     expect(mockEditor.setEditable).toHaveBeenCalledWith(false);
 
     component.setDisabledState(false);
-    expect(component.disabled).toBe(false);
+    expect(component.disabled).toBeFalse();
     expect(mockEditor.setEditable).toHaveBeenCalledWith(true);
     expect(emits).toBeGreaterThan(0);
     sub.unsubscribe();
@@ -204,9 +202,9 @@ describe('NgxMatTiptap', () => {
     });
     component.editor = mockEditor;
 
-    expect(component.isBoldActive()).toBe(true);
-    expect(component.isItalicActive()).toBe(false);
-    expect(component.isBulletListActive()).toBe(true);
+    expect(component.isBoldActive()).toBeTrue();
+    expect(component.isItalicActive()).toBeFalse();
+    expect(component.isBulletListActive()).toBeTrue();
   });
 
   it('toggle methods should chain and run when editor exists', () => {
@@ -217,7 +215,6 @@ describe('NgxMatTiptap', () => {
     component.toggleItalic();
     component.toggleBulletList();
 
-    // Ensure chain() was used and run() executed for each
     expect(mockEditor.chain).toHaveBeenCalled();
   });
 
