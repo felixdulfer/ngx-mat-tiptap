@@ -91,8 +91,8 @@ print_status "Test coverage: ${COVERAGE_PERCENTAGE}%"
 
 # Update README badge with current coverage
 print_status "Updating README coverage badge..."
-# Use a simpler approach to update the badge
-sed -i.bak "s/81.7%25/${COVERAGE_PERCENTAGE}%25/" README.md
+# Use regex to find and replace any coverage percentage in the badge
+sed -i.bak "s/test%20coverage-[0-9.]*%25/test%20coverage-${COVERAGE_PERCENTAGE}%25/" README.md
 rm -f README.md.bak
 
 # Get current version
