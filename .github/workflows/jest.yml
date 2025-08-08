@@ -26,7 +26,7 @@ jobs:
         id: testcmd
         shell: bash
         run: |
-          if npm run | grep -E "(?<=^  )test:coverage" >/dev/null 2>&1; then
+          if node -e "const p=require('./package.json'); process.exit(!(p.scripts && p.scripts['test:coverage']));"; then
             echo "Detected npm script test:coverage"
             echo "test_command=npm run test:coverage" >> "$GITHUB_OUTPUT"
           else
