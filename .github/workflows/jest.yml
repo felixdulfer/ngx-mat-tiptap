@@ -22,14 +22,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Determine test command
+        id: testcmd
+        shell: bash
+        run: |
+          if npm run | grep -E "(?<=^  )test:coverage" >/dev/null 2>&1; then
+            echo "Detected npm script test:coverage"
+            echo "test_command=npm run test:coverage" >> "$GITHUB_OUTPUT"
+          else
+            echo "No test:coverage script found; falling back to npx jest --coverage"
+            echo "test_command=npx jest --coverage" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run Jest with coverage and report to PR
         uses: willcaul/jest-github-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Use the same command we run locally for coverage
-          test-command: npm run test:coverage
-          # Keep default (false) to comment full coverage table
+          test-command: ${{ steps.testcmd.outputs.test_command }}
           coverage-comment: true
-          # repo root (adjust if monorepo subdir is needed)
           working-directory: .
