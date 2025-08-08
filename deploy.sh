@@ -77,7 +77,7 @@ echo "$TEST_OUTPUT" | tail -20
 
 # Extract coverage percentage from Jest output
 # Jest outputs coverage in a table format, look for the "All files" row
-COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep "All files" | awk '{print $3}' | sed 's/%//')
+COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep "All files" | tr -s ' ' | cut -d' ' -f3 | sed 's/%//')
 if [ -z "$COVERAGE_PERCENTAGE" ]; then
     print_warning "Could not extract coverage percentage, using default value"
     COVERAGE_PERCENTAGE="81.7"
