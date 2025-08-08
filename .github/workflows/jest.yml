@@ -28,10 +28,10 @@ jobs:
         run: |
           if node -e "const p=require('./package.json'); process.exit(!(p.scripts && p.scripts['test:coverage']));"; then
             echo "Detected npm script test:coverage"
-            echo "test_command=npm run test:coverage" >> "$GITHUB_OUTPUT"
+            echo "test_command=npm run test:coverage -- --json --outputFile=jest.results.json" >> "$GITHUB_OUTPUT"
           else
             echo "No test:coverage script found; falling back to npx jest --coverage"
-            echo "test_command=npx jest --coverage" >> "$GITHUB_OUTPUT"
+            echo "test_command=npx jest --coverage --json --outputFile=jest.results.json" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run Jest with coverage and report to PR
