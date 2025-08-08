@@ -17,28 +17,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Determine test command
-        id: testcmd
-        shell: bash
-        run: |
-          if node -e "const p=require('./package.json'); process.exit(!(p.scripts && p.scripts['test:coverage']));"; then
-            echo "Detected npm script test:coverage"
-            echo "test_command=npm run test:coverage -- --json --outputFile=jest.results.json" >> "$GITHUB_OUTPUT"
-          else
-            echo "No test:coverage script found; falling back to npx jest --coverage"
-            echo "test_command=npx jest --coverage --json --outputFile=jest.results.json" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Run Jest with coverage and report to PR
         uses: willcaul/jest-github-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          test-command: ${{ steps.testcmd.outputs.test_command }}
+          test-command: npm run test:coverage -- --json --outputFile=jest.results.json
           coverage-comment: true
           working-directory: .
