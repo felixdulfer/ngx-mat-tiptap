@@ -76,16 +76,8 @@ print_status "Debug: Last 20 lines of test output:"
 echo "$TEST_OUTPUT" | tail -20
 
 # Extract coverage percentage from Jest output
-# Jest outputs coverage in a different format, look for the statements percentage
-COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep -o "Statements.*[0-9.]*%" | head -1 | grep -o "[0-9.]*%" | sed 's/%//')
-if [ -z "$COVERAGE_PERCENTAGE" ]; then
-    # Try alternative Jest output format
-    COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep -o "All files.*[0-9.]*%" | head -1 | grep -o "[0-9.]*%" | sed 's/%//')
-fi
-if [ -z "$COVERAGE_PERCENTAGE" ]; then
-    # Try looking for coverage summary in a different format
-    COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep -A 10 "Coverage Summary" | grep "Statements" | grep -o "[0-9.]*%" | sed 's/%//')
-fi
+# Jest outputs coverage in a table format, look for the "All files" row
+COVERAGE_PERCENTAGE=$(echo "$TEST_OUTPUT" | grep "All files" | awk '{print $3}' | sed 's/%//')
 if [ -z "$COVERAGE_PERCENTAGE" ]; then
     print_warning "Could not extract coverage percentage, using default value"
     COVERAGE_PERCENTAGE="81.7"
@@ -95,8 +87,8 @@ print_status "Test coverage: ${COVERAGE_PERCENTAGE}%"
 
 # Update README badge with current coverage
 print_status "Updating README coverage badge..."
-# Use a more robust approach to update the badge
-sed -i.bak "s/test%20coverage-[0-9.]*%25/test%20coverage-${COVERAGE_PERCENTAGE}%25/" README.md
+# Use a simpler approach to update the badge
+sed -i.bak "s/81.7%25/${COVERAGE_PERCENTAGE}%25/" README.md
 rm -f README.md.bak
 
 # Get current version
