@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -27,6 +27,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          test-command: npm run test:coverage -- --json --outputFile=jest.results.json
+          # Use the same command we run locally for coverage
+          test-command: npm run test:coverage
+          # Keep default (false) to comment full coverage table
           coverage-comment: true
+          # repo root (adjust if monorepo subdir is needed)
           working-directory: .
