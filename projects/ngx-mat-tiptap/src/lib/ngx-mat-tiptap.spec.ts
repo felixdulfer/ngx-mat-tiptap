@@ -226,4 +226,129 @@ describe('NgxMatTiptap', () => {
     component.ngOnDestroy();
     expect(mockEditor.destroy).toHaveBeenCalled();
   });
+
+    it('should handle onContainerClick when clicking div element', () => {
+    const mockEditor = createMockEditor();
+    component.editor = mockEditor;
+
+    const div = document.createElement('div');
+    const event = { target: div } as unknown as MouseEvent;
+
+    component.onContainerClick(event);
+
+    expect(mockEditor.commands.focus).not.toHaveBeenCalled();
+  });
+
+  it('should handle onFocusOut when focus stays within host element', () => {
+    component.onFocusIn();
+
+    // Create a mock element ref
+    const mockElement = document.createElement('div');
+    const insideEl = document.createElement('span');
+    mockElement.appendChild(insideEl);
+
+    // Mock the elementRef
+    (component as any)._elementRef = { nativeElement: mockElement };
+
+    const fakeEvent = {
+      relatedTarget: insideEl,
+    } as unknown as FocusEvent;
+
+    component.onFocusOut(fakeEvent);
+
+    expect(component.touched).toBe(false);
+    expect(component.focused).toBe(true);
+  });
+
+  it('should test autoFocusNext and autoFocusPrev methods', () => {
+    const mockControl = {} as any;
+    const mockEvent = {} as KeyboardEvent;
+
+    // These methods are currently empty implementations
+    expect(() => component.autoFocusNext(mockControl, mockEvent)).not.toThrow();
+    expect(() => component.autoFocusPrev(mockControl, mockEvent)).not.toThrow();
+  });
+
+  it('should test registerOnChange and registerOnTouched', () => {
+    const mockChangeFn = jest.fn();
+    const mockTouchedFn = jest.fn();
+
+    component.registerOnChange(mockChangeFn);
+    component.registerOnTouched(mockTouchedFn);
+
+    // Test that the functions are called when appropriate
+    component.onChange('test');
+    component.onTouched();
+
+    expect(mockChangeFn).toHaveBeenCalledWith('test');
+    expect(mockTouchedFn).toHaveBeenCalled();
+  });
+
+  it('should test getter properties', () => {
+    // Test placeholder getter
+    expect(component.placeholder).toBe('');
+
+    // Test required getter
+    expect(component.required).toBe(false);
+
+    // Test disabled getter
+    expect(component.disabled).toBe(false);
+
+    // Test value getter
+    expect(component.value).toBe('');
+  });
+
+  it('should test writeValue when editor exists and value differs', () => {
+    const mockEditor = createMockEditor({ getJSONReturn: { content: [] } });
+    component.editor = mockEditor;
+
+    const newValue = { content: [{ type: 'paragraph', content: [] }] };
+    component.writeValue(newValue);
+
+    expect(component.value).toEqual(newValue);
+    expect(mockEditor.commands.setContent).toHaveBeenCalled();
+  });
+
+  it('should test writeValue when editor exists but value is same', () => {
+    const sameValue = { content: [] };
+    const mockEditor = createMockEditor({ getJSONReturn: sameValue });
+    component.editor = mockEditor;
+
+    component.writeValue(sameValue);
+
+    expect(component.value).toEqual(sameValue);
+    expect(mockEditor.commands.setContent).not.toHaveBeenCalled();
+  });
+
+  it('should test writeValue when editor does not exist', () => {
+    component.editor = null;
+
+    const newValue = { content: [] };
+    component.writeValue(newValue);
+
+    expect(component.value).toEqual(newValue);
+  });
+
+  it('should test setDisabledState when editor exists', () => {
+    const mockEditor = createMockEditor();
+    component.editor = mockEditor;
+
+    component.setDisabledState(true);
+    expect(component.disabled).toBe(true);
+    expect(mockEditor.setEditable).toHaveBeenCalledWith(false);
+
+    component.setDisabledState(false);
+    expect(component.disabled).toBe(false);
+    expect(mockEditor.setEditable).toHaveBeenCalledWith(true);
+  });
+
+  it('should test setDisabledState when editor does not exist', () => {
+    component.editor = null;
+
+    component.setDisabledState(true);
+    expect(component.disabled).toBe(true);
+
+    component.setDisabledState(false);
+    expect(component.disabled).toBe(false);
+  });
 });
