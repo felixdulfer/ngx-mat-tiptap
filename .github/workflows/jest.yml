@@ -1,0 +1,35 @@
+name: Test and Coverage
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest with coverage and report to PR
+        uses: willcaul/jest-github-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Use the same command we run locally for coverage
+          test-command: npm run test:coverage
+          # Keep default (false) to comment full coverage table
+          coverage-comment: true
+          # repo root (adjust if monorepo subdir is needed)
+          working-directory: .
