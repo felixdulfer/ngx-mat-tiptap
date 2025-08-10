@@ -24,11 +24,24 @@ npm install @felixdulfer/ngx-mat-tiptap
 import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";
 ```
 
-### 2. Import the Styles (Optional)
+### 2. Import the Styles
 
-If you need the custom form field styling, import the global styles:
+Import the library's CSS file for proper form field styling integration:
 
-```scss
+```typescript
+// In angular.json (global styles)
+"styles": [
+  "node_modules/@felixdulfer/ngx-mat-tiptap/styles.css",
+  // ... other styles
+]
+
+// Or in a component
+@Component({
+  // ...
+  styleUrls: ['../../node_modules/@felixdulfer/ngx-mat-tiptap/styles.css']
+})
+
+// Or using SCSS import
 @import "@felixdulfer/ngx-mat-tiptap/styles.css";
 ```
 
@@ -117,7 +130,7 @@ The library provides a directive `NgxMatTipTapFormFieldDirective` that can be ap
 </mat-form-field>
 ```
 
-The directive automatically adds the CSS class `ngx-mat-tiptap-form-field` to the form field for proper styling integration.
+The directive automatically adds the CSS class `ngx-mat-tiptap-form-field` to the form field for proper styling integration. **Make sure to import the library's CSS file** as shown in the Installation section above for the styling to work correctly.
 
 ## Content Format
 
