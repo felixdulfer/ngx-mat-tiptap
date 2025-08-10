@@ -5,6 +5,16 @@
     "type": "git",
     "url": "https://github.com/felixdulfer/ngx-mat-tiptap.git"
   },
+  "main": "./fesm2022/felixdulfer-ngx-mat-tiptap.mjs",
+  "module": "./fesm2022/felixdulfer-ngx-mat-tiptap.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./fesm2022/felixdulfer-ngx-mat-tiptap.mjs",
+      "types": "./index.d.ts"
+    },
+    "./styles.css": "./styles.css"
+  },
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0",
