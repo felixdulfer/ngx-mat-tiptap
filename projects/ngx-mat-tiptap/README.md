@@ -117,6 +117,42 @@ The editor includes the following formatting options:
 - **Italic** - `Ctrl+I` or toolbar button
 - **Bullet Lists** - Toolbar button
 
+## HTML Utilities
+
+The library provides utility functions and components for working with TipTap content outside of the editor:
+
+### Utility Functions
+
+```typescript
+import { generateHTMLFromTiptap, generateTiptapFromHTML, renderTiptapContent, isTiptapContentEmpty } from "@felixdulfer/ngx-mat-tiptap";
+
+// Convert TipTap JSON to HTML
+const html = generateHTMLFromTiptap(tiptapContent);
+
+// Convert HTML to TipTap JSON
+const tiptapJson = generateTiptapFromHTML("<p>Hello world</p>");
+
+// Render with optional CSS class
+const renderedHtml = renderTiptapContent(tiptapContent, "my-content-class");
+
+// Check if content is empty
+const isEmpty = isTiptapContentEmpty(tiptapContent);
+```
+
+### Angular Pipe
+
+```html
+<!-- In your template -->
+<div [innerHTML]="tiptapContent | tiptapHtml"></div>
+```
+
+### Renderer Component
+
+```html
+<!-- Render TipTap content as HTML -->
+<ngx-mat-tiptap-renderer [content]="tiptapContent" [cssClass]="'my-content'" />
+```
+
 ## Form Field Integration
 
 The library provides a directive `NgxMatTipTapFormFieldDirective` that can be applied to `mat-form-field` elements to ensure proper styling and behavior when using the TipTap editor within Angular Material form fields.
@@ -152,8 +188,6 @@ The editor uses TipTap's JSON format for content. The content structure follows 
   ]
 }
 ```
-
-
 
 ## Requirements
 

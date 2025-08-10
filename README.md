@@ -41,7 +41,7 @@ Import the library's CSS file in your global styles or component:
 ### 1. Import the Component and Directive
 
 ```typescript
-import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from '@felixdulfer/ngx-mat-tiptap';
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";
 ```
 
 ### 2. Use in Template
@@ -62,13 +62,13 @@ import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from '@felixdulfer/ngx-m
 ## Complete Example
 
 ```typescript
-import { Component } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from '@felixdulfer/ngx-mat-tiptap';
+import { Component } from "@angular/core";
+import { FormGroup, FormControl, ReactiveFormsModule } from "@angular/forms";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";
 
 @Component({
-  selector: 'app-editor',
+  selector: "app-editor",
   standalone: true,
   imports: [ReactiveFormsModule, MatFormFieldModule, NgxMatTiptap, NgxMatTipTapFormFieldDirective],
   template: `
@@ -78,29 +78,29 @@ import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from '@felixdulfer/ngx-m
         <mat-label>Rich Text Editor</mat-label>
       </mat-form-field>
     </form>
-    
+
     <div>
       <h3>Editor Content:</h3>
-      <pre>{{ form.get('content')?.value | json }}</pre>
+      <pre>{{ form.get("content")?.value | json }}</pre>
     </div>
-  `
+  `,
 })
 export class EditorComponent {
   form = new FormGroup({
     content: new FormControl({
-      type: 'doc',
+      type: "doc",
       content: [
         {
-          type: 'paragraph',
+          type: "paragraph",
           content: [
             {
-              type: 'text',
-              text: 'Hello, this is a rich text editor!'
-            }
-          ]
-        }
-      ]
-    })
+              type: "text",
+              text: "Hello, this is a rich text editor!",
+            },
+          ],
+        },
+      ],
+    }),
   });
 }
 ```
@@ -110,8 +110,44 @@ export class EditorComponent {
 The editor includes the following formatting options:
 
 - **Bold** - `Ctrl+B` or toolbar button
-- **Italic** - `Ctrl+I` or toolbar button  
+- **Italic** - `Ctrl+I` or toolbar button
 - **Bullet Lists** - Toolbar button
+
+## HTML Utilities
+
+The library provides utility functions and components for working with TipTap content outside of the editor:
+
+### Utility Functions
+
+```typescript
+import { generateHTMLFromTiptap, generateTiptapFromHTML, renderTiptapContent, isTiptapContentEmpty } from "@felixdulfer/ngx-mat-tiptap";
+
+// Convert TipTap JSON to HTML
+const html = generateHTMLFromTiptap(tiptapContent);
+
+// Convert HTML to TipTap JSON
+const tiptapJson = generateTiptapFromHTML("<p>Hello world</p>");
+
+// Render with optional CSS class
+const renderedHtml = renderTiptapContent(tiptapContent, "my-content-class");
+
+// Check if content is empty
+const isEmpty = isTiptapContentEmpty(tiptapContent);
+```
+
+### Angular Pipe
+
+```html
+<!-- In your template -->
+<div [innerHTML]="tiptapContent | tiptapHtml"></div>
+```
+
+### Renderer Component
+
+```html
+<!-- Render TipTap content as HTML -->
+<ngx-mat-tiptap-renderer [content]="tiptapContent" [cssClass]="'my-content'" />
+```
 
 ## Form Field Integration
 
@@ -148,8 +184,6 @@ The editor uses TipTap's JSON format for content. The content structure follows 
   ]
 }
 ```
-
-
 
 ## Requirements
 
