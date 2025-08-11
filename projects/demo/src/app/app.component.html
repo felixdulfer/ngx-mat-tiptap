@@ -1,50 +1,80 @@
-<header class="demo-header">
-  <h1>ngx-mat-tiptap Demo</h1>
-</header>
-<section class="demo-section">
-  <form [formGroup]="form">
-    <div class="editors-container">
-      <div class="editor-section">
-        <mat-form-field ngxMatTipTapFormField appearance="outline" class="tiptap-editor">
-          <ngx-mat-tiptap formControlName="tiptapContent" />
-          <mat-label>Tiptap editor</mat-label>
-        </mat-form-field>
-        <div class="value-display">
-          <pre><code>{{ form.get('tiptapContent')?.value | json }}</code></pre>
+<section>
+  <header class="demo-header">
+    <h1>ngx-mat-tiptap Demo</h1>
+  </header>
+  <section class="demo-section">
+    <form [formGroup]="form">
+      <div class="editors-container">
+        <div class="editor-section">
+          <mat-form-field
+            ngxMatTipTapFormField
+            appearance="outline"
+            class="tiptap-editor"
+          >
+            <ngx-mat-tiptap formControlName="tiptapContent" />
+            <mat-label>Tiptap editor</mat-label>
+          </mat-form-field>
+          <div class="value-display">
+            <pre><code>{{ form.get('tiptapContent')?.value | json }}</code></pre>
+          </div>
+        </div>
+        <div class="editor-section">
+          <mat-form-field appearance="outline" class="regular-textarea">
+            <mat-label>Regular textarea</mat-label>
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              cdkAutosizeMaxRows="10"
+              formControlName="regularText"
+            ></textarea>
+          </mat-form-field>
         </div>
       </div>
-      <div class="editor-section">
-        <mat-form-field appearance="outline" class="regular-textarea">
-          <mat-label>Regular textarea</mat-label>
-          <textarea
-            matInput
-            cdkTextareaAutosize
-            cdkAutosizeMaxRows="10"
-            formControlName="regularText"
-          ></textarea>
-        </mat-form-field>
-      </div>
-    </div>
-  </form>
+    </form>
+  </section>
 </section>
 
-<section class="demo-section">
-  <h2>Rendered Content Preview</h2>
-  <div class="renderer-container">
-    <div class="renderer-section">
-      <h3>HTML Output</h3>
+<section>
+  <header class="demo-header">
+    <h2>Rendered Content Preview</h2>
+  </header>
+  <section class="demo-section">
+    <div>
+      <h3>Example: Using <code>ngx-mat-tiptap-renderer</code></h3>
+      <p>
+        The <code>ngx-mat-tiptap-renderer</code> component renders TipTap JSON
+        content as HTML. Example usage:
+      </p>
       <div class="html-output">
-        <pre><code>{{ getRawHtml() }}</code></pre>
+        <pre><code>&lt;ngx-mat-tiptap-renderer
+  [content]="form.get('tiptapContent')?.value"
+  [cssClass]="'my-content-class'"&gt;
+&lt;/ngx-mat-tiptap-renderer&gt;
+</code></pre>
+      </div>
+      <p>
+        This will display the formatted content from the editor below, using the
+        optional CSS class <code>my-content-class</code>.
+      </p>
+    </div>
+  </section>
+  <section class="demo-section">
+    <div class="renderer-container">
+      <div class="renderer-section">
+        <h3>HTML Output (Raw)</h3>
+        <div class="html-output">
+          <pre><code>{{ getRawHtml() }}</code></pre>
+        </div>
+      </div>
+      <div class="renderer-section">
+        <h3>Rendered Preview</h3>
+        <div class="rendered-preview">
+          <ngx-mat-tiptap-renderer
+            [content]="form.get('tiptapContent')?.value"
+            [cssClass]="'demo-content'"
+          />
+        </div>
       </div>
     </div>
-    <div class="renderer-section">
-      <h3>Rendered Preview</h3>
-      <div class="rendered-preview">
-        <ngx-mat-tiptap-renderer
-          [content]="form.get('tiptapContent')?.value"
-          [cssClass]="'demo-content'">
-        </ngx-mat-tiptap-renderer>
-      </div>
-    </div>
-  </div>
+  </section>
 </section>

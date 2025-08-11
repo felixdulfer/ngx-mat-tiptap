@@ -9,7 +9,7 @@ import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { NgxMatTiptap, NgxMatTipTapFormFieldDirective, NgxMatTiptapRendererComponent, TiptapHtmlPipe, generateHTMLFromTiptap } from 'ngx-mat-tiptap';
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective, NgxMatTiptapRendererComponent, generateHTMLFromTiptap } from 'ngx-mat-tiptap';
 import { MatIconRegistry } from '@angular/material/icon';
 
 @Component({
@@ -26,7 +26,6 @@ import { MatIconRegistry } from '@angular/material/icon';
     NgxMatTiptap,
     NgxMatTipTapFormFieldDirective,
     NgxMatTiptapRendererComponent,
-    TiptapHtmlPipe,
   ],
 })
 export class AppComponent {
