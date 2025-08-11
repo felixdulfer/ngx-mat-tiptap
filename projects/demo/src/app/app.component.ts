@@ -9,7 +9,7 @@ import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from 'ngx-mat-tiptap';
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective, NgxMatTiptapRendererComponent, TiptapHtmlPipe, generateHTMLFromTiptap } from 'ngx-mat-tiptap';
 import { MatIconRegistry } from '@angular/material/icon';
 
 @Component({
@@ -25,6 +25,8 @@ import { MatIconRegistry } from '@angular/material/icon';
     MatInputModule,
     NgxMatTiptap,
     NgxMatTipTapFormFieldDirective,
+    NgxMatTiptapRendererComponent,
+    TiptapHtmlPipe,
   ],
 })
 export class AppComponent {
@@ -41,7 +43,72 @@ export class AppComponent {
             content: [
               {
                 type: 'text',
-                text: 'Hello, Tiptap!',
+                text: 'Hello, Tiptap! This is a ',
+              },
+              {
+                type: 'text',
+                marks: [{ type: 'bold' }],
+                text: 'rich text editor',
+              },
+              {
+                type: 'text',
+                text: ' with ',
+              },
+              {
+                type: 'text',
+                marks: [{ type: 'italic' }],
+                text: 'formatting options',
+              },
+              {
+                type: 'text',
+                text: '.',
+              },
+            ],
+          },
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'You can create:',
+              },
+            ],
+          },
+          {
+            type: 'bulletList',
+            content: [
+              {
+                type: 'listItem',
+                content: [
+                  {
+                    type: 'paragraph',
+                    content: [
+                      {
+                        type: 'text',
+                        text: 'Bullet points',
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: 'listItem',
+                content: [
+                  {
+                    type: 'paragraph',
+                    content: [
+                      {
+                        type: 'text',
+                        text: 'Bold and ',
+                      },
+                      {
+                        type: 'text',
+                        marks: [{ type: 'italic' }],
+                        text: 'italic text',
+                      },
+                    ],
+                  },
+                ],
               },
             ],
           },
@@ -65,4 +132,14 @@ export class AppComponent {
     this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
   }
 
+  getRawHtml(): string {
+    const content = this.form.get('tiptapContent')?.value;
+    if (!content) return '';
+    try {
+      return generateHTMLFromTiptap(content);
+    } catch (error) {
+      console.error('Error generating HTML:', error);
+      return '';
+    }
+  }
 }

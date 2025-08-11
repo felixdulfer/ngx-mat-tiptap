@@ -27,3 +27,24 @@
     </div>
   </form>
 </section>
+
+<section class="demo-section">
+  <h2>Rendered Content Preview</h2>
+  <div class="renderer-container">
+    <div class="renderer-section">
+      <h3>HTML Output</h3>
+      <div class="html-output">
+        <pre><code>{{ getRawHtml() }}</code></pre>
+      </div>
+    </div>
+    <div class="renderer-section">
+      <h3>Rendered Preview</h3>
+      <div class="rendered-preview">
+        <ngx-mat-tiptap-renderer
+          [content]="form.get('tiptapContent')?.value"
+          [cssClass]="'demo-content'">
+        </ngx-mat-tiptap-renderer>
+      </div>
+    </div>
+  </div>
+</section>

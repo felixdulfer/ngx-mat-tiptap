@@ -142,12 +142,42 @@ const isEmpty = isTiptapContentEmpty(tiptapContent);
 <div [innerHTML]="tiptapContent | tiptapHtml"></div>
 ```
 
+**Note**: The `tiptapHtml` pipe returns a `SafeHtml` object. Use `[innerHTML]` binding when you want to render the HTML, or use `generateHTMLFromTiptap()` directly when you need the raw HTML string.
+
 ### Renderer Component
+
+The `NgxMatTiptapRenderer` component provides a safe and easy way to render TipTap content as HTML with proper styling:
 
 ```html
 <!-- Render TipTap content as HTML -->
 <ngx-mat-tiptap-renderer [content]="tiptapContent" [cssClass]="'my-content'" />
 ```
+
+**Component Properties:**
+- `content`: The TipTap JSON content to render
+- `cssClass`: Optional CSS class to apply to the rendered content
+
+**Usage Example:**
+```typescript
+import { NgxMatTiptapRendererComponent } from "@felixdulfer/ngx-mat-tiptap";
+
+@Component({
+  // ...
+  imports: [NgxMatTiptapRendererComponent],
+  template: `
+    <ngx-mat-tiptap-renderer 
+      [content]="editorContent" 
+      [cssClass]="'article-content'">
+    </ngx-mat-tiptap-renderer>
+  `
+})
+```
+
+**Important Notes:**
+- The renderer component automatically handles HTML sanitization for security
+- Use `generateHTMLFromTiptap()` when you need the raw HTML string (e.g., for display in code blocks)
+- Use the renderer component when you want to display the formatted content to users
+- The component includes built-in CSS for proper typography and spacing
 
 ## Form Field Integration
 
