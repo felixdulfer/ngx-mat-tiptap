@@ -1,4 +1,9 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  inject,
+  AfterViewInit,
+  AfterViewChecked,
+} from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -9,8 +14,14 @@ import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { NgxMatTiptap, NgxMatTipTapFormFieldDirective, NgxMatTiptapRendererComponent, generateHTMLFromTiptap } from 'ngx-mat-tiptap';
+import {
+  NgxMatTiptap,
+  NgxMatTipTapFormFieldDirective,
+  NgxMatTiptapRendererComponent,
+  generateHTMLFromTiptap,
+} from 'ngx-mat-tiptap';
 import { MatIconRegistry } from '@angular/material/icon';
+import * as Prism from 'prismjs';
 
 @Component({
   selector: 'app-root',
@@ -28,8 +39,7 @@ import { MatIconRegistry } from '@angular/material/icon';
     NgxMatTiptapRendererComponent,
   ],
 })
-export class AppComponent {
-
+export class AppComponent implements AfterViewInit, AfterViewChecked {
   matIconReg = inject(MatIconRegistry);
 
   form: FormGroup = new FormGroup({
@@ -113,7 +123,7 @@ export class AppComponent {
           },
         ],
       },
-      [Validators.required]
+      [Validators.required],
     ),
     regularText: new FormControl('', [
       Validators.required,
@@ -131,14 +141,68 @@ export class AppComponent {
     this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
   }
 
+  ngAfterViewInit(): void {
+    this.highlightCode();
+  }
+
+  ngAfterViewChecked(): void {
+    this.highlightCode();
+  }
+
   getRawHtml(): string {
     const content = this.form.get('tiptapContent')?.value;
     if (!content) return '';
     try {
-      return generateHTMLFromTiptap(content);
+      const html = generateHTMLFromTiptap(content);
+      return this.formatHTML(html);
     } catch (error) {
       console.error('Error generating HTML:', error);
       return '';
     }
+  }
+
+  private formatHTML(html: string): string {
+    let indent = 0;
+    const indentSize = 2;
+    const lines: string[] = [];
+
+    // Split HTML into individual tags and text
+    const parts = html.match(/<[^>]*>|[^<]+/g) || [];
+
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+
+      if (trimmed.startsWith('</')) {
+        // Closing tag - decrease indent first
+        indent -= indentSize;
+        lines.push(' '.repeat(Math.max(0, indent)) + trimmed);
+      } else if (trimmed.startsWith('<') && !trimmed.endsWith('/>')) {
+        // Opening tag - add current indent, then increase
+        lines.push(' '.repeat(Math.max(0, indent)) + trimmed);
+        indent += indentSize;
+      } else {
+        // Self-closing tag or text content
+        lines.push(' '.repeat(Math.max(0, indent)) + trimmed);
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  private highlightCode(): void {
+    // Use setTimeout to ensure DOM is ready
+    setTimeout(() => {
+      try {
+        if (typeof Prism !== 'undefined') {
+          Prism.highlightAll();
+          console.log('Prism.js highlighting applied');
+        } else {
+          console.warn('Prism.js not loaded');
+        }
+      } catch (error) {
+        console.error('Error applying syntax highlighting:', error);
+      }
+    }, 100); // Increased timeout for better reliability
   }
 }

@@ -1,17 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
 @import "@angular/material/prebuilt-themes/azure-blue.css";
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-}
+/* Prism.js syntax highlighting */
+@import 'prismjs/themes/prism.css';
+@import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Import the library's global styles */
 @import "../../ngx-mat-tiptap/src/styles.css";

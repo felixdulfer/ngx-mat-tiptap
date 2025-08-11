@@ -38,7 +38,9 @@
     "@angular/router": "20.1.6",
     "@tiptap/core": "^2.26.1",
     "@tiptap/starter-kit": "^2.26.1",
+    "@types/prismjs": "^1.26.5",
     "ngx-tiptap": "^13.0.0",
+    "prismjs": "^1.30.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -56,6 +58,7 @@
     "jest-environment-node": "^29.7.0",
     "jest-preset-angular": "^14.6.1",
     "ng-packagr": "^20.1.0",
+    "prettier": "^3.6.2",
     "puppeteer": "^24.16.0",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",

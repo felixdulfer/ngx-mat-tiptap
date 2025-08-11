@@ -39,49 +39,14 @@
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 4px;
-
-  pre {
-    margin: 0;
-    padding: 0.5rem;
-    border-radius: 3px;
-    font-size: 12px;
-    line-height: 1.4;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  code {
-    font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-    color: #333;
-  }
 }
 
-.html-output,
 .rendered-preview {
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   background-color: #fafafa;
-}
-
-.html-output {
-  pre {
-    margin: 0;
-    padding: 0.5rem;
-    border-radius: 3px;
-    font-size: 12px;
-    line-height: 1.4;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  code {
-    font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-    color: #333;
-  }
 }
 
 .rendered-preview {

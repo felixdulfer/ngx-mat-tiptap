@@ -15,7 +15,7 @@
             <mat-label>Tiptap editor</mat-label>
           </mat-form-field>
           <div class="value-display">
-            <pre><code>{{ form.get('tiptapContent')?.value | json }}</code></pre>
+            <pre><code class="language-json">{{ form.get('tiptapContent')?.value | json }}</code></pre>
           </div>
         </div>
         <div class="editor-section">
@@ -46,11 +46,9 @@
         content as HTML. Example usage:
       </p>
       <div class="html-output">
-        <pre><code>&lt;ngx-mat-tiptap-renderer
+        <pre><code class="language-html">&lt;ngx-mat-tiptap-renderer
   [content]="form.get('tiptapContent')?.value"
-  [cssClass]="'my-content-class'"&gt;
-&lt;/ngx-mat-tiptap-renderer&gt;
-</code></pre>
+  [cssClass]="'my-content-class'" /&gt;</code></pre>
       </div>
       <p>
         This will display the formatted content from the editor below, using the
@@ -63,7 +61,7 @@
       <div class="renderer-section">
         <h3>HTML Output (Raw)</h3>
         <div class="html-output">
-          <pre><code>{{ getRawHtml() }}</code></pre>
+          <pre><code class="language-html">{{ getRawHtml() }}</code></pre>
         </div>
       </div>
       <div class="renderer-section">
