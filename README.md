@@ -2,7 +2,7 @@
 
 A rich text editor component for Angular Material applications built with TipTap.
 
-[![Test Coverage](https://img.shields.io/badge/test%20coverage-88.04%25-brightgreen)](https://github.com/felixdulfer/ngx-mat-tiptap)
+[![Test Coverage](https://img.shields.io/badge/test%20coverage-89.36%25-brightgreen)](https://github.com/felixdulfer/ngx-mat-tiptap)
 
 ## Installation
 
