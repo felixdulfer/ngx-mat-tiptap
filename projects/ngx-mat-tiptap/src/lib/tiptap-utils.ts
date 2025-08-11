@@ -35,9 +35,9 @@ export function generateTiptapFromHTML(htmlContent: string): any {
       content: [
         {
           type: 'paragraph',
-          content: []
-        }
-      ]
+          content: [],
+        },
+      ],
     };
   }
 
@@ -50,9 +50,9 @@ export function generateTiptapFromHTML(htmlContent: string): any {
       content: [
         {
           type: 'paragraph',
-          content: []
-        }
-      ]
+          content: [],
+        },
+      ],
     };
   }
 }
@@ -68,7 +68,9 @@ export function generateTextFromTiptap(jsonContent: any): string {
   }
 
   try {
-    return generateText(jsonContent, [StarterKit]);
+    return generateText(jsonContent, [StarterKit], {
+      blockSeparator: '\n\n',
+    }).replace(/\n\n+/g, '\n');
   } catch (error) {
     console.error('Error generating text from TipTap content:', error);
     return '';
@@ -81,7 +83,10 @@ export function generateTextFromTiptap(jsonContent: any): string {
  * @param cssClass - Optional CSS class to apply to the rendered HTML
  * @returns HTML string with optional CSS class
  */
-export function renderTiptapContent(jsonContent: any, cssClass?: string): string {
+export function renderTiptapContent(
+  jsonContent: any,
+  cssClass?: string,
+): string {
   const html = generateHTMLFromTiptap(jsonContent);
 
   if (!cssClass) {
