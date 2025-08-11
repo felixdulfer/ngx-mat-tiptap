@@ -1,4 +1,4 @@
-import { generateHTML, generateJSON } from '@tiptap/core';
+import { generateHTML, generateJSON, generateText } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 
 /**
@@ -54,6 +54,24 @@ export function generateTiptapFromHTML(htmlContent: string): any {
         }
       ]
     };
+  }
+}
+
+/**
+ * Generates plain text from TipTap JSON content
+ * @param jsonContent - The TipTap JSON content object
+ * @returns Plain text string representation of the content
+ */
+export function generateTextFromTiptap(jsonContent: any): string {
+  if (!jsonContent || typeof jsonContent !== 'object') {
+    return '';
+  }
+
+  try {
+    return generateText(jsonContent, [StarterKit]);
+  } catch (error) {
+    console.error('Error generating text from TipTap content:', error);
+    return '';
   }
 }
 
