@@ -19,6 +19,7 @@ import {
   NgxMatTipTapFormFieldDirective,
   NgxMatTiptapRendererComponent,
   generateHTMLFromTiptap,
+  generateTextFromTiptap,
 } from 'ngx-mat-tiptap';
 import { MatIconRegistry } from '@angular/material/icon';
 import * as Prism from 'prismjs';
@@ -157,6 +158,17 @@ export class AppComponent implements AfterViewInit, AfterViewChecked {
       return this.formatHTML(html);
     } catch (error) {
       console.error('Error generating HTML:', error);
+      return '';
+    }
+  }
+
+  getPlainText(): string {
+    const content = this.form.get('tiptapContent')?.value;
+    if (!content) return '';
+    try {
+      return generateTextFromTiptap(content);
+    } catch (error) {
+      console.error('Error generating plain text:', error);
       return '';
     }
   }
