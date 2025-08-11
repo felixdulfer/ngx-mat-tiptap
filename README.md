@@ -135,15 +135,6 @@ const renderedHtml = renderTiptapContent(tiptapContent, "my-content-class");
 const isEmpty = isTiptapContentEmpty(tiptapContent);
 ```
 
-### Angular Pipe
-
-```html
-<!-- In your template -->
-<div [innerHTML]="tiptapContent | tiptapHtml"></div>
-```
-
-**Note**: The `tiptapHtml` pipe returns a `SafeHtml` object. Use `[innerHTML]` binding when you want to render the HTML, or use `generateHTMLFromTiptap()` directly when you need the raw HTML string.
-
 ### Renderer Component
 
 The `NgxMatTiptapRenderer` component provides a safe and easy way to render TipTap content as HTML with proper styling:
