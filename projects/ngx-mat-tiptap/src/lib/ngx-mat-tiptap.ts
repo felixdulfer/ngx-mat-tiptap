@@ -48,7 +48,7 @@ import { MatDividerModule } from '@angular/material/divider';
               [disabled]="disabled"
               title="Bold"
             >
-              <mat-icon>format_bold</mat-icon>
+              <mat-icon fontSet="material-symbols-outlined">format_bold</mat-icon>
             </button>
             <button
               matIconButton
@@ -59,7 +59,7 @@ import { MatDividerModule } from '@angular/material/divider';
               [disabled]="disabled"
               title="Italic"
             >
-              <mat-icon>format_italic</mat-icon>
+              <mat-icon fontSet="material-symbols-outlined">format_italic</mat-icon>
             </button>
             <button
               matIconButton
@@ -70,7 +70,7 @@ import { MatDividerModule } from '@angular/material/divider';
               [disabled]="disabled"
               title="Bullet List"
             >
-              <mat-icon>format_list_bulleted</mat-icon>
+              <mat-icon fontSet="material-symbols-outlined">format_list_bulleted</mat-icon>
             </button>
           </div>
         </div>
