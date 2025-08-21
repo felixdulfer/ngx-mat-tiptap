@@ -9,6 +9,7 @@ import {
   OnInit,
   inject,
   ViewEncapsulation,
+  forwardRef,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,7 +36,7 @@ import { MatDividerModule } from '@angular/material/divider';
         (focusin)="onFocusIn()"
         (focusout)="onFocusOut($event)"
       ></div>
-      <div class="expander" [class.expanded]="!empty">
+      <div class="expander" [class.expanded]="shouldShowToolbar">
         <div class="expander-content">
           <mat-divider class="divider" />
           <div class="tiptap-toolbar">
@@ -169,7 +170,7 @@ import { MatDividerModule } from '@angular/material/divider';
   providers: [
     {
       provide: MatFormFieldControl,
-      useExisting: NgxMatTiptap,
+      useExisting: forwardRef(() => NgxMatTiptap),
     },
   ],
   encapsulation: ViewEncapsulation.None,
@@ -197,6 +198,8 @@ export class NgxMatTiptap
   // Internal writable signals for state management
   private _value = signal<any>('');
   private _disabled = signal(false);
+  private _initiallyEmpty = signal(true);
+  private _userHasTyped = signal(false);
   public editor: Editor | null = null;
 
   stateChanges = new Subject<void>();
@@ -266,6 +269,8 @@ export class NgxMatTiptap
         const json = editor.getJSON();
         this._value.set(json);
         this.onChange(json);
+        // Mark that user has typed content
+        this._userHasTyped.set(true);
         this.stateChanges.next();
       },
       onFocus: () => {
@@ -324,11 +329,33 @@ export class NgxMatTiptap
   }
 
   writeValue(value: any): void {
+    // Track if this is initial content (before user has typed)
+    if (!this._userHasTyped()) {
+      // Check if the NEW value would be empty
+      const newValueEmpty = this.isValueEmpty(value);
+      this._initiallyEmpty.set(newValueEmpty);
+    }
+    
     this._value.set(value);
     if (this.editor && value !== this.editor.getJSON()) {
       this.editor.commands.setContent(value || null);
     }
     this.stateChanges.next();
+  }
+
+  private isValueEmpty(value: any): boolean {
+    return (
+      !value ||
+      (typeof value === 'object' &&
+        (!value.content ||
+          (Array.isArray(value.content) &&
+            value.content.length === 0) ||
+          (Array.isArray(value.content) &&
+            value.content.length === 1 &&
+            value.content[0].type === 'paragraph' &&
+            (!value.content[0].content ||
+              value.content[0].content.length === 0))))
+    );
   }
 
   registerOnChange(fn: any): void {
@@ -352,6 +379,18 @@ export class NgxMatTiptap
             (!this.value.content[0].content ||
               this.value.content[0].content.length === 0))))
     );
+  }
+
+  get shouldShowToolbar(): boolean {
+    const currentEmpty = this.empty;
+    const userHasTyped = this._userHasTyped();
+    const initiallyEmpty = this._initiallyEmpty();
+    
+    // Show toolbar only if:
+    // 1. Content is not empty AND
+    // 2. Editor or toolbar has focus AND  
+    // 3. User has typed (not just initial content) OR started empty and now has content
+    return !currentEmpty && this.focused && (userHasTyped || (initiallyEmpty && !currentEmpty));
   }
 
   get shouldLabelFloat(): boolean {
