@@ -1,15 +1,14 @@
-import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree, chain } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { addPackageJsonDependency, NodeDependency, NodeDependencyType } from '@schematics/angular/utility/dependencies';
-import { getWorkspace } from '@schematics/angular/utility/workspace';
+import { updateWorkspace } from '@schematics/angular/utility/workspace';
 import { NgAddOptions } from './schema';
 
 /**
  * Adds the ngx-mat-tiptap library styles to the angular.json styles array
  */
 function addStylesToAngularJson(options: NgAddOptions): Rule {
-  return async (tree: Tree) => {
-    const workspace = await getWorkspace(tree);
+  return updateWorkspace((workspace) => {
     const projectName = options.project || workspace.extensions.defaultProject as string;
     
     if (!projectName) {
@@ -44,9 +43,7 @@ function addStylesToAngularJson(options: NgAddOptions): Rule {
         styles.push(stylePath);
       }
     }
-
-    return tree;
-  };
+  });
 }
 
 /**
@@ -87,36 +84,42 @@ function addDependencies(options: NgAddOptions): Rule {
 }
 
 /**
+ * Logs completion message
+ */
+function logCompletionMessage(): Rule {
+  return (_tree: Tree, context: SchematicContext) => {
+    context.logger.info('');
+    context.logger.info('✨ ngx-mat-tiptap has been successfully added to your project!');
+    context.logger.info('');
+    context.logger.info('Next steps:');
+    context.logger.info('  1. Import the components in your module or component:');
+    context.logger.info('     import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";');
+    context.logger.info('');
+    context.logger.info('  2. Use the editor in your template:');
+    context.logger.info('     <mat-form-field ngxMatTipTapFormField appearance="outline">');
+    context.logger.info('       <ngx-mat-tiptap formControlName="content" />');
+    context.logger.info('       <mat-label>Rich Text Editor</mat-label>');
+    context.logger.info('     </mat-form-field>');
+    context.logger.info('');
+    context.logger.info('  For more information, visit: https://github.com/felixdulfer/ngx-mat-tiptap');
+  };
+}
+
+/**
  * Main ng-add schematic
  */
 export function ngAdd(options: NgAddOptions): Rule {
-  return async (tree: Tree, context: SchematicContext) => {
+  return (_tree: Tree, context: SchematicContext) => {
     context.logger.info('Adding ngx-mat-tiptap to your Angular project...');
 
-    return async () => {
-      // Add styles to angular.json
-      await addStylesToAngularJson(options)(tree, context);
-      context.logger.info('✅ Added styles to angular.json');
-
-      // Add dependencies
-      addDependencies(options)(tree, context);
-
-      context.logger.info('');
-      context.logger.info('✨ ngx-mat-tiptap has been successfully added to your project!');
-      context.logger.info('');
-      context.logger.info('Next steps:');
-      context.logger.info('  1. Import the components in your module or component:');
-      context.logger.info('     import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";');
-      context.logger.info('');
-      context.logger.info('  2. Use the editor in your template:');
-      context.logger.info('     <mat-form-field ngxMatTipTapFormField appearance="outline">');
-      context.logger.info('       <ngx-mat-tiptap formControlName="content" />');
-      context.logger.info('       <mat-label>Rich Text Editor</mat-label>');
-      context.logger.info('     </mat-form-field>');
-      context.logger.info('');
-      context.logger.info('  For more information, visit: https://github.com/felixdulfer/ngx-mat-tiptap');
-
-      return tree;
-    };
+    return chain([
+      addStylesToAngularJson(options),
+      (tree: Tree, ctx: SchematicContext) => {
+        ctx.logger.info('✅ Added styles to angular.json');
+        return tree;
+      },
+      addDependencies(options),
+      logCompletionMessage(),
+    ]);
   };
 }
