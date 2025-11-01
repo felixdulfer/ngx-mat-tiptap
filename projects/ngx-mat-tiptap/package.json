@@ -27,5 +27,9 @@
     "tslib": "^2.8.1"
   },
   "sideEffects": false,
-  "style": "styles.css"
+  "style": "styles.css",
+  "schematics": "./schematics/collection.json",
+  "ng-add": {
+    "save": "dependencies"
+  }
 }

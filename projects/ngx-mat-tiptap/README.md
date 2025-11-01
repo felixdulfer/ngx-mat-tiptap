@@ -4,6 +4,23 @@ A rich text editor component for Angular Material applications built with TipTap
 
 ## Installation
 
+### Using Angular Schematics (Recommended)
+
+The easiest way to install ngx-mat-tiptap is using Angular schematics with the `ng add` command:
+
+```bash
+ng add @felixdulfer/ngx-mat-tiptap
+```
+
+This command will automatically:
+- Install the library and its peer dependencies (`@tiptap/core` and `@tiptap/starter-kit`)
+- Add the required styles to your `angular.json`
+- Display usage instructions
+
+### Manual Installation
+
+Alternatively, you can install manually:
+
 First, install the required peer dependencies:
 
 ```bash
@@ -16,17 +33,7 @@ Then install the component:
 npm install @felixdulfer/ngx-mat-tiptap
 ```
 
-## Basic Usage
-
-### 1. Import the Component and Directive
-
-```typescript
-import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";
-```
-
-### 2. Import the Styles
-
-Import the library's CSS file for proper form field styling integration:
+When installing manually, you need to import the library's CSS file for proper form field styling integration:
 
 ```typescript
 // In angular.json (global styles)
@@ -45,7 +52,15 @@ Import the library's CSS file for proper form field styling integration:
 @import "@felixdulfer/ngx-mat-tiptap/styles.css";
 ```
 
-### 3. Use in Template
+## Basic Usage
+
+### 1. Import the Component and Directive
+
+```typescript
+import { NgxMatTiptap, NgxMatTipTapFormFieldDirective } from "@felixdulfer/ngx-mat-tiptap";
+```
+
+### 2. Use in Template
 
 The editor does work stand-alone, but if this is what you are after, then better use ngx-tiptap instead.
 
@@ -53,7 +68,7 @@ The editor does work stand-alone, but if this is what you are after, then better
 <ngx-mat-tiptap [(ngModel)]="content" />
 ```
 
-### 4. With Angular Material Form Field
+### 3. With Angular Material Form Field
 
 ```html
 <mat-form-field ngxMatTipTapFormField appearance="outline">

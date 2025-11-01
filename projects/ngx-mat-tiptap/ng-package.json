@@ -9,6 +9,21 @@
       "glob": "styles.css",
       "input": "src/",
       "output": "./"
+    },
+    {
+      "glob": "**/*.json",
+      "input": "schematics/",
+      "output": "./schematics"
+    },
+    {
+      "glob": "**/*.js",
+      "input": "schematics/.schematics/",
+      "output": "./schematics"
+    },
+    {
+      "glob": "**/*.d.ts",
+      "input": "schematics/.schematics/",
+      "output": "./schematics"
     }
   ]
 }

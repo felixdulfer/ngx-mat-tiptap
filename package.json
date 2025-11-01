@@ -6,8 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "build:demo": "ng build demo",
-    "build:lib": "ng build ngx-mat-tiptap",
+    "build:lib": "npm run build:schematics && ng build ngx-mat-tiptap",
     "build:lib:watch": "ng build ngx-mat-tiptap --watch",
+    "build:schematics": "tsc -p projects/ngx-mat-tiptap/schematics/tsconfig.json",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -45,9 +46,11 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
+    "@angular-devkit/schematics": "^20.3.8",
     "@angular/build": "^20.3.8",
     "@angular/cli": "^20.3.8",
     "@angular/compiler-cli": "^20.3.9",
+    "@schematics/angular": "^20.3.8",
     "@types/jest": "^29.5.14",
     "conventional-changelog": "^7.1.1",
     "conventional-changelog-angular": "^8.1.0",

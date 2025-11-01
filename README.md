@@ -6,6 +6,23 @@ A rich text editor component for Angular Material applications built with TipTap
 
 ## Installation
 
+### Using Angular Schematics (Recommended)
+
+The easiest way to install ngx-mat-tiptap is using Angular schematics with the `ng add` command:
+
+```bash
+ng add @felixdulfer/ngx-mat-tiptap
+```
+
+This command will automatically:
+- Install the library and its peer dependencies (`@tiptap/core` and `@tiptap/starter-kit`)
+- Add the required styles to your `angular.json`
+- Display usage instructions
+
+### Manual Installation
+
+Alternatively, you can install manually:
+
 First, install the required peer dependencies:
 
 ```bash
@@ -18,9 +35,9 @@ Then install the component:
 npm install @felixdulfer/ngx-mat-tiptap
 ```
 
-### Import Styles
+#### Import Styles (Manual Installation Only)
 
-Import the library's CSS file in your global styles or component:
+When installing manually, you need to import the library's CSS file in your global styles:
 
 ```typescript
 // In angular.json (global styles)
