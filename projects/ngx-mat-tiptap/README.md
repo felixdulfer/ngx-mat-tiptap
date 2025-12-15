@@ -226,10 +226,10 @@ The editor uses TipTap's JSON format for content. The content structure follows 
 
 ## Requirements
 
-- Angular 20.1.0 or higher
-- Angular Material 20.1.0 or higher
-- TipTap Core 2.26.1 or higher
-- TipTap Starter Kit 2.26.1 or higher
+- Angular 20.0.0 or 21.0.0 or higher
+- Angular Material 20.0.0 or 21.0.0 or higher
+- TipTap Core 3.10.1 or higher
+- TipTap Starter Kit 3.10.1 or higher
 
 ## Contributing
 
