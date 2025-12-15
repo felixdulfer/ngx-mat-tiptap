@@ -7,7 +7,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:demo": "ng build demo",
-    "build:lib": "ng build ngx-mat-tiptap && node -e \"require('fs').writeFileSync('dist/ngx-mat-tiptap/index.d.ts', 'export * from \\\"./types/felixdulfer-ngx-mat-tiptap\\\";\\n')\"",
+    "build:lib": "ng build ngx-mat-tiptap && node -e \"const fs = require('fs'); const path = 'dist/ngx-mat-tiptap'; fs.writeFileSync(path + '/index.d.ts', 'export * from \\\"./types/felixdulfer-ngx-mat-tiptap\\\";\\n'); const pkg = JSON.parse(fs.readFileSync(path + '/package.json', 'utf8')); if (pkg.exports && pkg.exports['.']) { pkg.exports['.'].types = './index.d.ts'; delete pkg.typings; fs.writeFileSync(path + '/package.json', JSON.stringify(pkg, null, 2) + '\\n'); }\"",
     "build:lib:watch": "ng build ngx-mat-tiptap --watch",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
