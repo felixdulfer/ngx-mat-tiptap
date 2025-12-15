@@ -10,5 +10,6 @@
       "input": "src/",
       "output": "./"
     }
-  ]
+  ],
+  "allowedNonPeerDependencies": []
 }

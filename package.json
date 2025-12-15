@@ -7,7 +7,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:demo": "ng build demo",
-    "build:lib": "ng build ngx-mat-tiptap",
+    "build:lib": "ng build ngx-mat-tiptap && node -e \"require('fs').writeFileSync('dist/ngx-mat-tiptap/index.d.ts', 'export * from \\\"./types/felixdulfer-ngx-mat-tiptap\\\";\\n')\"",
     "build:lib:watch": "ng build ngx-mat-tiptap --watch",
     "watch": "ng build --watch --configuration development",
     "test": "jest",

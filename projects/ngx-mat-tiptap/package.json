@@ -10,8 +10,7 @@
   "types": "./index.d.ts",
   "exports": {
     ".": {
-      "import": "./fesm2022/felixdulfer-ngx-mat-tiptap.mjs",
-      "types": "./index.d.ts"
+      "import": "./fesm2022/felixdulfer-ngx-mat-tiptap.mjs"
     },
     "./styles.css": "./styles.css"
   },
