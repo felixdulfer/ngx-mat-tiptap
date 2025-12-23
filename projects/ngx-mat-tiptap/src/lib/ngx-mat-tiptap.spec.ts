@@ -370,4 +370,120 @@ describe('NgxMatTiptap', () => {
 
     expect(component.editor).toBeNull();
   });
+
+  describe('shouldShowToolbar', () => {
+    it('should return false when editor is empty and not focused', () => {
+      component.writeValue({});
+      component.focused = false;
+
+      expect(component.shouldShowToolbar).toBe(false);
+    });
+
+    it('should return false when editor has content but is not focused', () => {
+      component.writeValue({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'hi' }] },
+        ],
+      });
+      component.focused = false;
+
+      expect(component.shouldShowToolbar).toBe(false);
+    });
+
+    it('should return false when editor is focused but empty', () => {
+      component.writeValue({});
+      component.focused = true;
+
+      expect(component.shouldShowToolbar).toBe(false);
+    });
+
+    it('should return true when user types content and editor is focused', () => {
+      // Start with empty content
+      component.writeValue({});
+      component.focused = true;
+
+      // Simulate user typing by triggering onUpdate callback
+      const mockEditor = createMockEditor();
+      component.editor = mockEditor;
+      
+      // Simulate the onUpdate callback directly
+      (component as any)._userHasTyped.set(true);
+      (component as any)._value.set({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'hi' }] },
+        ],
+      });
+
+      expect(component.shouldShowToolbar).toBe(true);
+    });
+
+    it('should return false on initialization with pre-existing content without focus', () => {
+      // Simulate initialization with content (no user typing yet)
+      component.writeValue({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'existing' }] },
+        ],
+      });
+      component.focused = false;
+
+      expect(component.shouldShowToolbar).toBe(false);
+    });
+
+    it('should return false on initialization with pre-existing content even with focus', () => {
+      // Simulate initialization with content (no user typing yet)
+      component.writeValue({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'existing' }] },
+        ],
+      });
+      component.focused = true;
+
+      expect(component.shouldShowToolbar).toBe(false);
+    });
+
+    it('should return true when user adds content to initially empty editor', () => {
+      // Start with empty content (initially empty)
+      component.writeValue({});
+      component.focused = true;
+
+      // User types content
+      (component as any)._userHasTyped.set(true);
+      (component as any)._value.set({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'new content' }] },
+        ],
+      });
+
+      expect(component.shouldShowToolbar).toBe(true);
+    });
+
+    it('should work correctly for empty -> content -> empty -> content cycle', () => {
+      component.focused = true;
+      
+      // Initially empty
+      component.writeValue({});
+      expect(component.shouldShowToolbar).toBe(false);
+
+      // User types content
+      (component as any)._userHasTyped.set(true);
+      (component as any)._value.set({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'content' }] },
+        ],
+      });
+      expect(component.shouldShowToolbar).toBe(true);
+
+      // User deletes content
+      (component as any)._value.set({});
+      expect(component.shouldShowToolbar).toBe(false);
+
+      // User types again
+      (component as any)._value.set({
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'new content' }] },
+        ],
+      });
+      expect(component.shouldShowToolbar).toBe(true);
+    });
+  });
 });
