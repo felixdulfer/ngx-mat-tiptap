@@ -1,11 +1,112 @@
-@import "@angular/material/prebuilt-themes/azure-blue.css";
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
 
 /* Prism.js syntax highlighting */
 @import 'prismjs/themes/prism.css';
 @import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+/* Defaults to following the OS preference; the in-app toggle overrides this
+   by adding .light-theme/.dark-theme, which pin color-scheme explicitly. */
+body {
+  color-scheme: light dark;
+}
+
+body.light-theme {
+  color-scheme: light;
+}
+
+body.dark-theme {
+  color-scheme: dark;
+
+  /* Prism "Tomorrow Night" palette, scoped to dark mode since the default
+     prism.css import above is light-only. */
+  code[class*='language-'],
+  pre[class*='language-'] {
+    color: #ccc;
+  }
+
+  :not(pre) > code[class*='language-'],
+  pre[class*='language-'] {
+    background: #2d2d2d;
+  }
+
+  .token.comment,
+  .token.block-comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #999;
+  }
+
+  .token.punctuation {
+    color: #ccc;
+  }
+
+  .token.tag,
+  .token.attr-name,
+  .token.namespace,
+  .token.deleted {
+    color: #e2777a;
+  }
+
+  .token.function-name {
+    color: #6196cc;
+  }
+
+  .token.boolean,
+  .token.number,
+  .token.function {
+    color: #f08d49;
+  }
+
+  .token.property,
+  .token.class-name,
+  .token.constant,
+  .token.symbol {
+    color: #f8c555;
+  }
+
+  .token.selector,
+  .token.important,
+  .token.atrule,
+  .token.keyword,
+  .token.builtin {
+    color: #cc99cd;
+  }
+
+  .token.string,
+  .token.char,
+  .token.attr-value,
+  .token.regex,
+  .token.variable {
+    color: #7ec699;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url {
+    color: #67cdcc;
+  }
+}
 
 /* Import the library's global styles */
 @import "../../ngx-mat-tiptap/src/styles.css";
