@@ -119,7 +119,7 @@ import { MatDividerModule } from '@angular/material/divider';
       transition: grid-template-rows 0.2s;
       position: sticky;
       bottom: 0;
-      background: white;
+      background: var(--mat-sys-surface-container-low);
     }
 
     .expander-content {
@@ -141,7 +141,7 @@ import { MatDividerModule } from '@angular/material/divider';
       gap: 4px;
       margin-top: 4px;
       padding: 0px 0.5rem 4px 0.5rem;
-      background: white;
+      background: var(--mat-sys-surface-container);
 
       .toolbar-btn {
         --mat-icon-button-container-shape: 12px;
