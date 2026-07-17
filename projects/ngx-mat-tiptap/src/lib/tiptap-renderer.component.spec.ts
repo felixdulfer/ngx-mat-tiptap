@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgxMatTiptapRendererComponent } from './tiptap-renderer.component';
 import * as tiptapUtils from './tiptap-utils';
@@ -11,6 +11,7 @@ import * as tiptapUtils from './tiptap-utils';
     </ngx-mat-tiptap-renderer>
   `,
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgxMatTiptapRendererComponent]
 })
 class TestHostComponent {

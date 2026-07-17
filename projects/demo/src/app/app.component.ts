@@ -3,6 +3,7 @@ import {
   inject,
   AfterViewInit,
   AfterViewChecked,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormGroup,
@@ -29,6 +30,7 @@ import * as Prism from 'prismjs';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ReactiveFormsModule,
     JsonPipe,

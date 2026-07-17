@@ -9,6 +9,7 @@ import {
   OnInit,
   inject,
   ViewEncapsulation,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -164,7 +165,6 @@ import { MatDividerModule } from '@angular/material/divider';
         }
       }
     }
-
   `,
   providers: [
     {
@@ -173,6 +173,7 @@ import { MatDividerModule } from '@angular/material/divider';
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     class: 'ngx-mat-tiptap',
   },
@@ -251,8 +252,6 @@ export class NgxMatTiptap
     }
   }
 
-
-
   private initEditor() {
     const element = this.editorElement();
     if (!element) return;
@@ -275,8 +274,6 @@ export class NgxMatTiptap
         this.onFocusOut(new FocusEvent('blur'));
       },
     });
-
-
   }
 
   onContainerClick(event: MouseEvent) {
