@@ -32,8 +32,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Use the same command we run locally for coverage
-          test-command: pnpm run test:coverage
+          # npm (not pnpm) here: this action appends extra jest flags via
+          # `<test-command> -- <flags>`, and pnpm@9.x mishandles a bare
+          # `--` (drops the args after it instead of stripping just the
+          # `--`), so jest never receives --outputFile and never writes
+          # jest.results.json. npm strips `--` correctly; dependencies are
+          # already installed via pnpm above, npm just runs the script.
+          test-command: npm run test:coverage
           # Keep default (false) to comment full coverage table
           coverage-comment: true
           # repo root (adjust if monorepo subdir is needed)
