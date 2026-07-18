@@ -16,7 +16,9 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "demo": "ng serve demo",
-    "demo:build": "ng build demo"
+    "demo:build": "ng build demo",
+    "release": "semantic-release",
+    "release:dry-run": "semantic-release --dry-run --no-ci"
   },
   "prettier": {
     "overrides": [
@@ -51,10 +53,14 @@
     "@angular/build": "^22.0.7",
     "@angular/cli": "^22.0.7",
     "@angular/compiler-cli": "^22.0.7",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.9",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/jest": "^30.0.0",
-    "conventional-changelog": "^7.1.1",
-    "conventional-changelog-angular": "^8.1.0",
-    "conventional-recommended-bump": "^11.2.0",
     "jest": "^30.4.2",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^30.4.1",
@@ -64,6 +70,7 @@
     "ng-packagr": "^22.0.1",
     "prettier": "^3.9.5",
     "puppeteer": "^25.3.0",
+    "semantic-release": "^25.0.7",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "~6.0.3",
