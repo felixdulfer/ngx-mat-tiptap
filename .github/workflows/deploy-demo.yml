@@ -30,7 +30,11 @@ jobs:
         run: pnpm run build:lib
 
       - name: Build demo app
-        run: pnpm run build:demo -- --base-href=/ngx-mat-tiptap/
+        # Use a dedicated script rather than `pnpm run build:demo -- --base-href=...`:
+        # pnpm@9.x forwards the bare `--` to Angular's CLI as an empty positional
+        # argument, which fails schema validation. Baking the flag into the script
+        # avoids passing `--` through pnpm entirely.
+        run: pnpm run build:demo:ghpages
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
