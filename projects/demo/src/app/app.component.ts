@@ -1,8 +1,10 @@
 import {
   Component,
   inject,
+  signal,
   AfterViewInit,
   AfterViewChecked,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormGroup,
@@ -13,6 +15,7 @@ import {
 import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import {
   NgxMatTiptap,
@@ -24,16 +27,20 @@ import {
 import { MatIconRegistry } from '@angular/material/icon';
 import * as Prism from 'prismjs';
 
+const THEME_STORAGE_KEY = 'ngx-mat-tiptap-demo-theme';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ReactiveFormsModule,
     JsonPipe,
     MatButtonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     NgxMatTiptap,
     NgxMatTipTapFormFieldDirective,
@@ -42,6 +49,8 @@ import * as Prism from 'prismjs';
 })
 export class AppComponent implements AfterViewInit, AfterViewChecked {
   matIconReg = inject(MatIconRegistry);
+
+  darkMode = signal(this.getInitialDarkMode());
 
   form: FormGroup = new FormGroup({
     tiptapContent: new FormControl(
@@ -140,6 +149,26 @@ export class AppComponent implements AfterViewInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
+    this.applyTheme(this.darkMode());
+  }
+
+  toggleDarkMode(): void {
+    const next = !this.darkMode();
+    this.darkMode.set(next);
+    localStorage.setItem(THEME_STORAGE_KEY, next ? 'dark' : 'light');
+    this.applyTheme(next);
+  }
+
+  private getInitialDarkMode(): boolean {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === 'dark') return true;
+    if (stored === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  private applyTheme(dark: boolean): void {
+    document.body.classList.toggle('dark-theme', dark);
+    document.body.classList.toggle('light-theme', !dark);
   }
 
   ngAfterViewInit(): void {

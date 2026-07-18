@@ -1,6 +1,15 @@
 <section>
   <header class="demo-header">
     <h1>ngx-mat-tiptap Demo</h1>
+    <button
+      matIconButton
+      type="button"
+      [attr.aria-label]="darkMode() ? 'Switch to light theme' : 'Switch to dark theme'"
+      title="Toggle dark mode"
+      (click)="toggleDarkMode()"
+    >
+      <mat-icon>{{ darkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
   </header>
   <section class="demo-section">
     <form [formGroup]="form">
@@ -15,7 +24,7 @@
             <mat-label>Tiptap editor</mat-label>
           </mat-form-field>
           <div class="value-display">
-            <pre><code class="language-json">{{ form.get('tiptapContent')?.value | json }}</code></pre>
+            <pre><code class="language-json">{{ $safeNavigationMigration(form.get('tiptapContent')?.value) | json }}</code></pre>
           </div>
         </div>
         <div class="editor-section">
@@ -74,7 +83,9 @@
         <h3>Rendered Preview</h3>
         <div class="rendered-preview">
           <ngx-mat-tiptap-renderer
-            [content]="form.get('tiptapContent')?.value"
+            [content]="
+              $safeNavigationMigration(form.get('tiptapContent')?.value)
+            "
             [cssClass]="'demo-content'"
           />
         </div>

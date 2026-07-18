@@ -1,6 +1,8 @@
 .demo-header {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .demo-section {
@@ -44,19 +46,15 @@
 .rendered-preview {
   margin-top: 1rem;
   padding: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 4px;
-  background-color: #fafafa;
-}
-
-.rendered-preview {
-  background-color: white;
+  background-color: var(--mat-sys-surface-container-low);
   min-height: 100px;
 }
 
 .demo-content {
   padding: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 4px;
-  background-color: white;
+  background-color: var(--mat-sys-surface-container-low);
 }

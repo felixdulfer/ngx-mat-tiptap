@@ -1,4 +1,10 @@
-import { Component, input, ViewEncapsulation, effect } from '@angular/core';
+import {
+  Component,
+  input,
+  ViewEncapsulation,
+  effect,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { generateHTMLFromTiptap } from './tiptap-utils';
 
@@ -14,8 +20,8 @@ import { generateHTMLFromTiptap } from './tiptap-utils';
     <div
       [class]="cssClass()"
       [innerHTML]="renderedHtml"
-      class="tiptap-rendered-content">
-    </div>
+      class="tiptap-rendered-content"
+    ></div>
   `,
   styles: `
     .tiptap-rendered-content {
@@ -30,7 +36,8 @@ import { generateHTMLFromTiptap } from './tiptap-utils';
       margin-bottom: 0;
     }
 
-    .tiptap-rendered-content ul, .tiptap-rendered-content ol {
+    .tiptap-rendered-content ul,
+    .tiptap-rendered-content ol {
       margin: 0 0 1rem 1.5rem;
       padding: 0;
     }
@@ -47,7 +54,8 @@ import { generateHTMLFromTiptap } from './tiptap-utils';
       font-style: italic;
     }
   `,
-  encapsulation: ViewEncapsulation.None
+  changeDetection: ChangeDetectionStrategy.Eager,
+  encapsulation: ViewEncapsulation.None,
 })
 export class NgxMatTiptapRendererComponent {
   /**
