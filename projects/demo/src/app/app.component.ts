@@ -14,9 +14,12 @@ import {
 } from '@angular/forms';
 import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import {
   NgxMatTiptap,
   NgxMatTipTapFormFieldDirective,
@@ -39,9 +42,12 @@ const THEME_STORAGE_KEY = 'ngx-mat-tiptap-demo-theme';
     ReactiveFormsModule,
     JsonPipe,
     MatButtonModule,
+    MatCardModule,
+    MatDividerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatToolbarModule,
     NgxMatTiptap,
     NgxMatTipTapFormFieldDirective,
     NgxMatTiptapRendererComponent,

@@ -16,6 +16,12 @@ html {
 @import 'prismjs/themes/prism.css';
 @import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
+/* Keep code blocks on the M3 surface token instead of Prism's default
+   background (the Prism rules target pre[class*='language-']). */
+pre.code-block {
+  background: var(--mat-sys-surface-container-high);
+}
+
 html, body { height: 100%; }
 body {
   margin: 0;
@@ -46,7 +52,7 @@ body.dark-theme {
 
   :not(pre) > code[class*='language-'],
   pre[class*='language-'] {
-    background: #2d2d2d;
+    background: var(--mat-sys-surface-container-high);
   }
 
   .token.comment,
