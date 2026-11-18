@@ -1,95 +1,124 @@
-<section>
-  <header class="demo-header">
-    <h1>ngx-mat-tiptap Demo</h1>
-    <button
-      matIconButton
-      type="button"
-      [attr.aria-label]="darkMode() ? 'Switch to light theme' : 'Switch to dark theme'"
-      title="Toggle dark mode"
-      (click)="toggleDarkMode()"
-    >
-      <mat-icon>{{ darkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-    </button>
-  </header>
-  <section class="demo-section">
+<mat-toolbar color="primary" class="app-toolbar">
+  <mat-icon class="app-logo">edit_note</mat-icon>
+  <span class="app-title">ngx-mat-tiptap demo</span>
+  <span class="toolbar-spacer"></span>
+  <button
+    matIconButton
+    type="button"
+    [attr.aria-label]="darkMode() ? 'Switch to light theme' : 'Switch to dark theme'"
+    title="Toggle dark mode"
+    (click)="toggleDarkMode()"
+  >
+    <mat-icon>{{ darkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="page-container">
+  <section class="demo-block">
+    <h1 class="section-title">Editor</h1>
     <form [formGroup]="form">
-      <div class="editors-container">
-        <div class="editor-section">
-          <mat-form-field
-            ngxMatTipTapFormField
-            appearance="outline"
-            class="tiptap-editor"
-          >
-            <ngx-mat-tiptap formControlName="tiptapContent" />
-            <mat-label>Tiptap editor</mat-label>
-          </mat-form-field>
-          <div class="value-display">
-            <pre><code class="language-json">{{ $safeNavigationMigration(form.get('tiptapContent')?.value) | json }}</code></pre>
-          </div>
-        </div>
-        <div class="editor-section">
-          <mat-form-field appearance="outline" class="regular-textarea">
-            <mat-label>Regular textarea</mat-label>
-            <textarea
-              matInput
-              cdkTextareaAutosize
-              cdkAutosizeMaxRows="10"
-              formControlName="regularText"
-            ></textarea>
-          </mat-form-field>
-        </div>
+      <div class="grid editors-grid">
+        <mat-card appearance="outlined" class="demo-card">
+          <mat-card-header>
+            <mat-card-title>Tiptap editor</mat-card-title>
+            <mat-card-subtitle
+              >Rich text via <code>ngx-mat-tiptap</code></mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <mat-form-field
+              ngxMatTipTapFormField
+              appearance="outline"
+              class="full-width tiptap-editor"
+            >
+              <ngx-mat-tiptap formControlName="tiptapContent" />
+              <mat-label>Tiptap editor</mat-label>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card appearance="outlined" class="demo-card">
+          <mat-card-header>
+            <mat-card-title
+              >Regular textarea</mat-card-title
+            >
+            <mat-card-subtitle
+              >Plain <code>matInput</code> for comparison</mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Regular textarea</mat-label>
+              <textarea
+                matInput
+                cdkTextareaAutosize
+                cdkAutosizeMaxRows="10"
+                formControlName="regularText"
+              ></textarea>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
       </div>
+
+      <mat-card appearance="outlined" class="demo-card value-card">
+        <mat-card-header>
+          <mat-card-title
+            >Form value (JSON)</mat-card-title
+          >
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="code-block scrollable"><code class="language-json">{{ $safeNavigationMigration(form.get('tiptapContent')?.value) | json }}</code></pre>
+        </mat-card-content>
+      </mat-card>
     </form>
   </section>
-</section>
 
-<section>
-  <header class="demo-header">
-    <h2>Rendered Content Preview</h2>
-  </header>
-  <section class="demo-section">
-    <div>
-      <h3>Example: Using <code>ngx-mat-tiptap-renderer</code></h3>
-      <p>
-        The <code>ngx-mat-tiptap-renderer</code> component renders TipTap JSON
-        content as HTML. Example usage:
-      </p>
-      <div class="html-output">
-        <pre><code class="language-html">&lt;ngx-mat-tiptap-renderer
+  <mat-divider class="section-divider"></mat-divider>
+
+  <section class="demo-block">
+    <h2 class="section-title section-title--small">Rendered content preview</h2>
+    <p class="section-description">
+      The <code>ngx-mat-tiptap-renderer</code> component renders TipTap JSON
+      content as HTML. Example usage:
+    </p>
+    <pre class="code-block usage-snippet"><code class="language-html">&lt;ngx-mat-tiptap-renderer
   [content]="form.get('tiptapContent')?.value"
   [cssClass]="'my-content-class'" /&gt;</code></pre>
-      </div>
-      <p>
-        This will display the formatted content from the editor below, using the
-        optional CSS class <code>my-content-class</code>.
-      </p>
+
+    <div class="grid outputs-grid">
+      <mat-card appearance="outlined" class="demo-card">
+        <mat-card-header>
+          <mat-card-title>HTML output (raw)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="code-block scrollable"><code class="language-html">{{ getRawHtml() }}</code></pre>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="demo-card">
+        <mat-card-header>
+          <mat-card-title>Plain text output</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="code-block scrollable"><code class="language-text">{{ getPlainText() }}</code></pre>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="demo-card">
+        <mat-card-header>
+          <mat-card-title>Rendered preview</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="rendered-preview">
+            <ngx-mat-tiptap-renderer
+              [content]="
+                $safeNavigationMigration(form.get('tiptapContent')?.value)
+              "
+              [cssClass]="'demo-content'"
+            />
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </section>
-  <section class="demo-section">
-    <div class="renderer-container">
-      <div class="renderer-section">
-        <h3>HTML Output (Raw)</h3>
-        <div class="html-output">
-          <pre><code class="language-html">{{ getRawHtml() }}</code></pre>
-        </div>
-      </div>
-      <div class="renderer-section">
-        <h3>Plain Text Output</h3>
-        <div class="plain-text-output">
-          <pre><code class="language-text">{{ getPlainText() }}</code></pre>
-        </div>
-      </div>
-      <div class="renderer-section">
-        <h3>Rendered Preview</h3>
-        <div class="rendered-preview">
-          <ngx-mat-tiptap-renderer
-            [content]="
-              $safeNavigationMigration(form.get('tiptapContent')?.value)
-            "
-            [cssClass]="'demo-content'"
-          />
-        </div>
-      </div>
-    </div>
-  </section>
-</section>
+</main>
