@@ -19,7 +19,7 @@ jobs:
 
       - name: Setup pnpm
         if: github.event.action != 'closed'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 9.0.0
 
