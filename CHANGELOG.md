@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/felixdulfer/ngx-mat-tiptap/compare/v0.8.0...v0.8.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **ci:** grant checks/pull-requests write to test workflow ([#34](https://github.com/felixdulfer/ngx-mat-tiptap/issues/34)) ([4175666](https://github.com/felixdulfer/ngx-mat-tiptap/commit/417566663a034c9680d7c16a330e8f594c956da8))
+
 # [0.8.0](https://github.com/felixdulfer/ngx-mat-tiptap/compare/v0.7.6...v0.8.0) (2026-11-18)
 
 
