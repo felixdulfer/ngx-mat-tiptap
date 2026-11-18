@@ -67,7 +67,7 @@
     "jest-environment-jsdom": "^30.5.2",
     "jest-environment-node": "^30.5.2",
     "jest-preset-angular": "^17.0.3",
-    "jsdom": "^29.1.1",
+    "jsdom": "^31.0.1",
     "ng-packagr": "^22.0.0",
     "prettier": "^3.10.1",
     "puppeteer": "^25.3.0",
