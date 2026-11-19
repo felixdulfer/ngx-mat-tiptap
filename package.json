@@ -70,7 +70,7 @@
     "jsdom": "^31.0.1",
     "ng-packagr": "^22.2.6",
     "prettier": "^3.10.1",
-    "puppeteer": "^25.3.0",
+    "puppeteer": "^25.17.0",
     "semantic-release": "^25.0.7",
     "ts-jest": "^29.4.15",
     "ts-node": "^10.9.2",
