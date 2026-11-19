@@ -1,0 +1,443 @@
+---
+id: assist-workflows-output
+title: "Conversational Workflows: Rich Output & UI"
+sidebar_position: 9.1
+---
+
+# Conversational Workflows: Rich Output & UI
+
+Rendering conversational-workflow output back to the user: streaming agent responses, canvas rich outputs and editing, rich UI components, and tool UI states. See [Inputs](assist-workflows) for setup and the interaction primitives these build on.
+
+## Streaming Agent Responses
+
+When using agents with `RemoteSession(stream=True)`, responses are automatically streamed to the UI as custom events. No additional code is needed:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="expense-analysis-workflow",
+)
+class ExpenseAnalysisWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self, expense_data: str) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        # Create a streaming session - responses will automatically
+        # stream to the UI as they are generated
+        session = workflows_mistralai.RemoteSession(stream=True)
+
+        analyst_agent = workflows_mistralai.Agent(
+            model="mistral-medium-2508",
+            name="expense-analyst",
+            description="Analyzes expense reports for policy compliance",
+            instructions="""You are an expense report analyst. Review the expense data
+and provide insights on:
+1. Policy compliance
+2. Unusual patterns
+3. Optimization suggestions
+
+Be concise and professional.""",
+        )
+
+        # The agent's response streams automatically custom events with JSON patches to update the UI.
+        await workflows_mistralai.Runner.run(
+            agent=analyst_agent,
+            inputs=f"Analyze this expense report:\n\n{expense_data}",
+            session=session,
+        )
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text="Analysis complete.")]
+        )
+```
+
+:::tip
+When `stream=True`, the agent's text output is streamed token-by-token to the UI. This provides a responsive experience for longer responses.
+:::
+
+## Rich Outputs (Canvas)
+
+Return rich content like markdown, code, or diagrams using `ResourceOutput`:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="expense-report-workflow",
+)
+class ExpenseReportWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self, department: str) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        # Generate a mermaid chart
+        chart_content = """
+pie title Expenses by Category
+    "Travel" : 45
+    "Equipment" : 25
+    "Software" : 20
+    "Other" : 10
+"""
+
+        canvas = workflows_mistralai.CanvasPayload(
+            type="mermaid",
+            title="Expense Breakdown",
+            content=chart_content,
+        )
+
+        resource = workflows_mistralai.CanvasResource(
+            canvas=canvas,
+        )
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[
+                workflows_mistralai.TextOutput(text=f"Expense report for {department}:"),
+                workflows_mistralai.ResourceOutput(resource=resource),
+            ]
+        )
+```
+
+### Canvas Types
+
+| Type            | Description                   |
+| --------------- | ----------------------------- |
+| `text/markdown` | Markdown content              |
+| `text/html`     | HTML content                  |
+| `image/svg+xml` | SVG images                    |
+| `slides`        | Presentation slides           |
+| `react`         | React components              |
+| `code`          | Code with syntax highlighting |
+| `mermaid`       | Mermaid diagrams              |
+
+## Canvas Editing (Human-in-the-Loop)
+
+You can send a canvas mid-workflow using `send_assistant_message()` and then let the user edit it.
+The `canvas_uri` passed to `CanvasInput` must match the `uri` of a `CanvasResource` output from a previous step.
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+from mistralai.workflows.conversational import CanvasInput
+
+@workflows.workflow.define(
+    name="report-review-workflow",
+)
+class ReportReviewWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        # Send a canvas to the user as an assistant message
+        canvas_resource = workflows_mistralai.CanvasResource(
+            canvas=workflows_mistralai.CanvasPayload(
+                type="text/markdown",
+                title="Weekly Report",
+                content="# Weekly Report\n\n## Summary\n\nTODO: fill in",
+            ),
+        )
+        await workflows_mistralai.send_assistant_message(
+            "Here is your report draft. You can review and edit it below.",
+            canvas=canvas_resource,
+        )
+
+        # Wait for the user to edit the canvas
+        edited = await self.wait_for_input(
+            CanvasInput(canvas_uri=canvas_resource.uri, prompt="Any feedback?"),
+            label="Review & Edit Report",
+        )
+
+        # Use the edited content
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[
+                workflows_mistralai.TextOutput(text="Report finalized!"),
+                workflows_mistralai.ResourceOutput(
+                    resource=workflows_mistralai.CanvasResource(
+                        canvas=workflows_mistralai.CanvasPayload(
+                            type="text/markdown",
+                            title=edited.canvas.title,
+                            content=edited.canvas.content,
+                        ),
+                    )
+                ),
+            ]
+        )
+```
+
+`CanvasInput` returns a model with:
+
+- `canvas.title` — the title of the edited canvas
+- `canvas.content` — the edited content
+- `chatInput` — optional chat message (only present when `prompt` is provided and the user sends a message)
+
+## Rich UI Components
+
+Workflows can render rich, interactive UI components in the chat interface using the design system component library. Components are defined as Python objects and sent as `UIComponentResource` resources.
+
+### Basic Usage
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+from mistralai.workflows.conversational_ui_components import (
+    Badge,
+    Card,
+    Column,
+    Markdown,
+    Row,
+)
+
+@workflows.workflow.define(
+    name="report-workflow",
+)
+class ReportWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        report = Card(
+            title="Summary",
+            children=[
+                Row(
+                    children=[
+                        Markdown(content="**Score:** 0.82"),
+                        Badge(variant="success", children="Pass"),
+                    ],
+                ),
+            ],
+        )
+
+        await workflows_mistralai.send_assistant_message(
+            [
+                workflows_mistralai.TextOutput(text="Here is your report:"),
+                workflows_mistralai.ResourceOutput(
+                    resource=workflows_mistralai.UIComponentResource(component=report),
+                ),
+            ]
+        )
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[
+                workflows_mistralai.ResourceOutput(
+                    resource=workflows_mistralai.UIComponentResource(component=report),
+                ),
+            ],
+        )
+```
+
+### Available Components
+
+All components are imported from `mistralai.workflows.conversational_ui_components`.
+
+| Component    | Description                                   | Key Props                                                             |
+| ------------ | --------------------------------------------- | --------------------------------------------------------------------- |
+| `Alert`      | Important messages with severity levels       | `title`, `variant` (info/warning/error/success), `children`           |
+| `Avatar`     | User avatar image                             | `src`, `alt`, `text`, `size`                                          |
+| `Badge`      | Small label for status indicators             | `variant` (default/primary/success/warning/error), `size`, `children` |
+| `ButtonLink` | Link styled as a button                       | `href`, `variant`, `size`, `external`, `children`                     |
+| `Card`       | Container with optional title and description | `title`, `description`, `padding`, `children`                         |
+| `Chart`      | Line or bar chart                             | `variant` (line/bar), `data`, `xAxis`, `yAxis`, `title`               |
+| `Column`     | Vertical layout container                     | `alignment`, `distribution`, `gap`, `children`                        |
+| `Image`      | Image display                                 | `src`, `alt`, `size`                                                  |
+| `Markdown`   | Markdown-formatted text                       | `content`                                                             |
+| `PieChart`   | Pie chart with labeled segments               | `data`, `title`                                                       |
+| `Row`        | Horizontal layout container                   | `alignment`, `distribution`, `gap`, `wrap`, `children`                |
+| `Tooltip`    | Additional information on hover               | `trigger`, `children`                                                 |
+
+### Nesting Components
+
+Components that accept `children` can contain other components, allowing you to build complex layouts:
+
+```python
+from mistralai.workflows.conversational_ui_components import (
+    Card,
+    Chart,
+    Column,
+    Row,
+)
+
+layout = Row(
+    children=[
+        Card(
+            title="Revenue",
+            children=[
+                Chart(
+                    variant="line",
+                    xAxis="month",
+                    yAxis=["actual", "target"],
+                    data=[
+                        {"month": "Jan", "actual": 100, "target": 120},
+                        {"month": "Feb", "actual": 140, "target": 130},
+                        {"month": "Mar", "actual": 160, "target": 140},
+                    ],
+                ),
+            ],
+        ),
+        Card(
+            title="Distribution",
+            children=[
+                Chart(
+                    variant="bar",
+                    xAxis="category",
+                    yAxis="count",
+                    data=[
+                        {"category": "A", "count": 42},
+                        {"category": "B", "count": 28},
+                        {"category": "C", "count": 15},
+                    ],
+                ),
+            ],
+        ),
+    ],
+)
+```
+
+## Tool UI States
+
+Tool UI States provide optional visual representations of tool execution in the chat interface. When attached to `ChatAssistantWorkingTask`, they enable specialized UI feedback for different types of tool operations, allowing workflows to display the status and results of tool calls in a structured, user-friendly way.
+
+### Tool UI State Types
+
+There are three types of tool UI states:
+
+#### File Tool UI State
+
+Represents file operations such as creating, replacing, or deleting files:
+
+```python
+from mistralai.workflows.conversational import (
+    FileToolUIState,
+    CreateFileOperation,
+    ReplaceFileOperation,
+    DeleteFileOperation,
+)
+
+## Create a file
+create_state = FileToolUIState(
+    toolCallId="tc-1",
+    operations=[
+        CreateFileOperation(
+            uri="file:///workspace/new.py",
+            content="print('Hello World')"
+        )
+    ],
+)
+
+## Replace file content
+replace_state = FileToolUIState(
+    toolCallId="tc-2",
+    operations=[
+        ReplaceFileOperation(
+            uri="file:///workspace/main.py",
+            fileContentBefore="old content",
+            blocks=[SearchReplaceBlock(search="old", replace="new")],
+        )
+    ],
+)
+
+## Delete a file
+delete_state = FileToolUIState(
+    toolCallId="tc-3",
+    operations=[
+        DeleteFileOperation(uri="file:///workspace/old.py")
+    ],
+)
+```
+
+#### Generic Tool UI State
+
+Represents generic tool execution with various status states:
+
+```python
+from mistralai.workflows.conversational import (
+    GenericToolUIState,
+    ToolResultRunning,
+    ToolResultSuccess,
+    ToolResultFailed,
+)
+
+## Tool is running
+running_state = GenericToolUIState(
+    toolCallId="tc-1",
+    name="bash",
+    arguments={"command": "ls -la"},
+    result=ToolResultRunning(),
+)
+
+## Tool completed successfully
+success_state = GenericToolUIState(
+    toolCallId="tc-2",
+    name="grep",
+    arguments={"pattern": "TODO"},
+    result=ToolResultSuccess(value={"matches": ["line1", "line2"]}),
+)
+
+## Tool failed
+failed_state = GenericToolUIState(
+    toolCallId="tc-3",
+    name="bash",
+    arguments={"command": "false"},
+    result=ToolResultFailed(error="exit code 1"),
+)
+```
+
+#### Command Tool UI State
+
+Represents command execution with running/success/failed states:
+
+```python
+from mistralai.workflows.conversational import (
+    CommandToolUIState,
+    CommandResultRunning,
+    CommandResultSuccess,
+    CommandResultFailed,
+)
+
+## Command is running
+running_state = CommandToolUIState(
+    toolCallId="tc-1",
+    command="npm install",
+    result=CommandResultRunning(),
+)
+
+## Command completed successfully
+success_state = CommandToolUIState(
+    toolCallId="tc-2",
+    command="pytest",
+    result=CommandResultSuccess(output="All tests passed"),
+)
+
+## Command failed
+failed_state = CommandToolUIState(
+    toolCallId="tc-3",
+    command="invalid-command",
+    result=CommandResultFailed(error="Command not found"),
+)
+```
+
+### Using Tool UI States in Working Tasks
+
+Tool UI States can be attached to `ChatAssistantWorkingTask` to provide visual feedback during tool execution:
+
+```python
+from mistralai.workflows.conversational import ChatAssistantWorkingTask
+
+## Show a working task with file operations
+task = ChatAssistantWorkingTask(
+    title="Creating file",
+    content="Generating new.py",
+    toolUIState=FileToolUIState(
+        toolCallId="tc-1",
+        operations=[CreateFileOperation(uri="file:///workspace/new.py", content="print('hi')")],
+    ),
+)
+
+## Show a working task with command execution
+command_task = ChatAssistantWorkingTask(
+    title="Running tests",
+    content="Executing pytest",
+    toolUIState=CommandToolUIState(
+        toolCallId="tc-2",
+        command="pytest",
+        result=CommandResultRunning(),
+    ),
+)
+```
+
+## Continue
+
+- [Platform Integration](assist-workflows-platform) — publishing in Vibe, tagging input variants, error handling, structured content, and the complete example

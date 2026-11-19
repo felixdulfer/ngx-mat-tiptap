@@ -1,0 +1,155 @@
+---
+id: scheduling
+title: Workflow Scheduling
+sidebar_position: 7
+---
+
+# Workflow Scheduling
+
+Run workflows on a recurring calendar, interval, or cron schedule. Schedules are created and managed through the Workflows API (or AI Studio), independently of your worker code: they persist across worker restarts and redeployments.
+
+## Creating a Schedule
+
+Create a schedule with the workflow name (the `name` in `@workflow.define`), the deployment that should run it, and a schedule definition. The workflow must be registered by a running worker first.
+
+```python
+from mistralai.client import models
+from mistralai.workflows.client import get_mistral_client
+
+client = get_mistral_client()
+
+response = await client.workflows.schedules.schedule_workflow_async(
+    workflow_identifier="report_workflow",
+    deployment_name="production",
+    schedule=models.ScheduleDefinition(
+        input={"report_type": "daily"},
+        calendars=[
+            models.ScheduleCalendar(
+                hour=[models.ScheduleRange(start=9)],
+                minute=[models.ScheduleRange(start=0)],
+            )
+        ],  # daily at 09:00 UTC
+    ),
+)
+print(response.schedule_id)
+```
+
+Each schedule carries its own `input`, passed to the workflow entrypoint on every run. Without `schedule_id`, the API derives the ID from the namespace, workflow, definition and deployment, so re-creating the same definition updates the existing schedule rather than adding one. Changing the definition changes the derived ID, though: a script that edits a schedule's cron or input creates a second schedule and leaves the old one running. Pass a stable `schedule_id` if you plan to change the schedule later.
+
+Create schedules from a deployment script, a CI step, or another control plane, not from `@workflow.define`. The `schedules=` argument of `@workflow.define` is deprecated: it is removed in SDK v4.
+
+## Schedule Specifications
+
+### Calendars
+
+Calendars are the recommended way to define schedules. Each field takes a list of `ScheduleRange(start, end, step)`: `ScheduleRange(start=9)` matches 9, `ScheduleRange(start=1, end=5)` matches 1 to 5, `ScheduleRange(start=0, end=59, step=15)` matches 0, 15, 30 and 45.
+
+Fields: `second`, `minute`, `hour`, `day_of_month`, `month`, `year`, `day_of_week` (0 = Sunday).
+
+```python
+schedule = models.ScheduleDefinition(
+    input={},
+    calendars=[
+        models.ScheduleCalendar(
+            hour=[models.ScheduleRange(start=9)],
+            minute=[models.ScheduleRange(start=30)],
+            day_of_week=[models.ScheduleRange(start=1, end=5)],  # Monday to Friday
+        )
+    ],
+)
+```
+
+### Intervals
+
+Fixed intervals use ISO 8601 durations, with an optional offset:
+
+```python
+schedule = models.ScheduleDefinition(
+    input={},
+    intervals=[models.ScheduleInterval(every="PT4H", offset="PT30M")],  # every 4 hours, at :30
+)
+```
+
+### Cron Expressions
+
+Standard 5-field cron expressions are converted to calendars server-side:
+
+```python
+schedule = models.ScheduleDefinition(
+    input={},
+    cron_expressions=["0 9 * * 1-5"],  # 09:00 UTC, Monday to Friday
+)
+```
+
+### Time Zone, Bounds and Exclusions
+
+- `time_zone_name` takes an IANA name such as `"Europe/Paris"`; schedules use UTC by default.
+- `start_at` and `end_at` limit when the schedule is active.
+- `skip` takes `ScheduleCalendar` entries for times that must not fire, such as public holidays.
+- `jitter` (ISO 8601 duration, e.g. `"PT5M"`) delays each run randomly, to spread load across schedules firing together.
+- `max_executions` stops the schedule after that many runs.
+
+## Schedule Policies
+
+```python
+schedule = models.ScheduleDefinition(
+    input={"source": "postgres"},
+    cron_expressions=["0 * * * *"],
+    policy=models.SchedulePolicy(
+        overlap=2,  # BUFFER_ONE
+        catchup_window_seconds=86400,
+        pause_on_failure=True,
+    ),
+)
+```
+
+- `overlap`: what happens when a run is due while the previous one is still running. `1` SKIP (default), `2` BUFFER_ONE, `3` BUFFER_ALL, `4` CANCEL_OTHER, `5` TERMINATE_OTHER, `6` ALLOW_ALL.
+- `catchup_window_seconds`: how far back missed runs are started after an outage. Defaults to one year.
+- `pause_on_failure`: pause the schedule when a scheduled run fails; resume it manually.
+
+## Managing Schedules
+
+```python
+schedules = client.workflows.schedules
+
+# List
+response = await schedules.get_schedules_async(workflow_name="report_workflow", page_size=50)
+
+# Inspect
+schedule = await schedules.get_schedule_async(schedule_id=schedule_id)
+print(schedule.paused, schedule.future_executions)
+
+# Update only the fields you pass
+await schedules.update_schedule_async(
+    schedule_id=schedule_id,
+    schedule=models.PartialScheduleDefinition(cron_expressions=["0 10 * * *"]),
+)
+
+# Pause and resume, with an optional audit note
+await schedules.pause_schedule_async(schedule_id=schedule_id, note="Paused for maintenance")
+await schedules.resume_schedule_async(schedule_id=schedule_id, note="Maintenance complete")
+
+# Run once now, outside the schedule
+await schedules.trigger_schedule_async(schedule_id=schedule_id, overlap=6)  # ALLOW_ALL
+
+# Delete
+await schedules.unschedule_workflow_async(schedule_id=schedule_id)
+```
+
+Schedules can also be created and managed in AI Studio.
+
+## Migrating from `@workflow.define(schedules=...)`
+
+Schedules declared in the decorator were registered by every worker at startup, so changing one required a worker redeploy, and workers running different versions could register conflicting definitions. To migrate:
+
+1. Create the schedule through the API with the same input, specification and policy, and pass an explicit `schedule_id`. Without one, the API derives the ID from the definition, which can match the ID of the schedule the decorator declared.
+2. Remove `schedules=[...]` from `@workflow.define` and redeploy the worker. When the worker registers, the API deletes the schedules it used to declare; the API schedule, with its own ID, is kept.
+
+Between the two steps both schedules are live, so every tick in that window runs the workflow twice. To avoid this, set `start_at` on the API schedule to a time after the redeploy, or swap the steps and accept a gap with no scheduled runs.
+
+`on_behalf_of=True` workflows cannot run on a schedule: scheduled runs have no triggering user.
+
+## Next Steps
+
+- [Workflow Guide](workflows) - Learn workflow fundamentals
+- [Signals, Queries & Updates](signals-queries-updates) - Other workflow interaction methods

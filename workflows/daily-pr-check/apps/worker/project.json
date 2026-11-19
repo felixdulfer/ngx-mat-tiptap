@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "worker",
+  "projectType": "application",
+  "targets": {
+    "semgrep": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash tools/uv.sh tool run semgrep@1.176.0 --config .agents/skills/capability-workflows/scripts/linting/rules --metrics=off apps/worker/src/worker/workflows",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
+}

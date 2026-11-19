@@ -1,0 +1,186 @@
+---
+id: assist-workflows-platform
+title: "Conversational Workflows: Platform Integration"
+sidebar_position: 9.2
+---
+
+# Conversational Workflows: Platform Integration
+
+Shipping a conversational workflow: publishing in Vibe, tagging input variants, error handling, structured content, and a complete end-to-end example. See [Inputs](assist-workflows) and [Rich Output & UI](assist-workflows-output) for the building blocks referenced here.
+
+## Publish in Vibe
+
+To publish a conversational workflow as an assistant in Vibe (Mistral's chat interface), your workflow must return a `ChatAssistantWorkflowOutput`.
+The output will not be displayed in Vibe, but we enforce a common interface for inter-operability.
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="expense-summary-workflow",
+)
+class ExpenseSummaryWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self, department: str) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        summary = f"Expense summary for {department}: Total $12,500"
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=summary)]
+        )
+```
+
+### Tagging Input Variants
+
+When a workflow accepts a union of input types, clients may need a way to know which variant to use. The `@input_tag` decorator adds an `x-input-tag` field to a model's JSON schema so clients can identify and select the right one.
+
+```python
+from pydantic import BaseModel
+
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+from mistralai.workflows.plugins.mistralai import input_tag
+
+class FullParams(BaseModel):
+    config: str
+    options: dict[str, str]
+
+@input_tag("simplified")
+class SimpleParams(BaseModel):
+    prompt: str
+
+@workflows.workflow.define(
+    name="multi-client-workflow",
+)
+class MultiClientWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self, params: FullParams | SimpleParams) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        if isinstance(params, SimpleParams):
+            resolved = params.prompt
+        else:
+            resolved = params.config
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=f"Received: {resolved}")]
+        )
+```
+
+`SimpleParams.model_json_schema()` now contains `"x-input-tag": "simplified"`. Clients inspect the union members in the workflow's `input_schema` and select the variant whose tag they recognise.
+
+### Error Handling
+
+To signal that a workflow has failed, set `isError=True` on the output.
+The text content is used as the error message displayed to the user, and the workflow is marked as failed in the conversation:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="expense-validation-workflow",
+)
+class ExpenseValidationWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self, expense_id: str) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        expense = lookup_expense(expense_id)
+        if expense is None:
+            return workflows_mistralai.ChatAssistantWorkflowOutput(
+                content=[workflows_mistralai.TextOutput(text=f"Expense {expense_id} not found.")],
+                isError=True,
+            )
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=f"Expense {expense_id} is valid.")]
+        )
+```
+
+### Structured Content
+
+`ChatAssistantWorkflowOutput` accepts an optional `structuredContent` field (`dict[str, Any]`)
+for attaching arbitrary structured data to the workflow output.
+
+```python
+return workflows_mistralai.ChatAssistantWorkflowOutput(
+    content=[workflows_mistralai.TextOutput(text="Done.")],
+    structuredContent={"tool": "web_search", "results": [{"url": "https://example.com"}]},
+)
+```
+
+## Complete Example
+
+Here's a full expense approval workflow combining todo list, user input, and streaming agent analysis:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="full-expense-workflow",
+)
+class FullExpenseWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self, expense_data: str) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        # Define workflow steps
+        analyze_item = workflows_mistralai.TodoListItem(
+            title="AI Analysis",
+            description="Analyze expense for compliance"
+        )
+        review_item = workflows_mistralai.TodoListItem(
+            title="Manager Review",
+            description="Get manager approval"
+        )
+        process_item = workflows_mistralai.TodoListItem(
+            title="Process",
+            description="Complete processing"
+        )
+
+        async with workflows_mistralai.TodoList(
+            items=[analyze_item, review_item, process_item]
+        ) as todo_list:
+            # Step 1: AI Analysis with streaming (using context manager)
+            async with analyze_item:
+                session = workflows_mistralai.RemoteSession(stream=True)
+                analyst = workflows_mistralai.Agent(
+                    model="mistral-medium-2508",
+                    name="expense-analyst",
+                    description="Expense policy analyst",
+                    instructions="Analyze the expense for policy compliance. Be brief.",
+                )
+
+                await workflows_mistralai.Runner.run(
+                    agent=analyst,
+                    inputs=expense_data,
+                    session=session,
+                )
+
+            # Step 2: Manager Review (using context manager)
+            async with review_item:
+                decision = await self.wait_for_input(
+                    workflows_mistralai.ChatInput(
+                        "Do you approve or reject this expense? Please explain.",
+                        suggestions=[
+                            [workflows_mistralai.TextChunk(text="Yes, approve this expense")],
+                            [workflows_mistralai.TextChunk(text="Reject")],
+                        ],
+                    )
+                )
+
+            # Step 3: Process (using manual status control for conditional logic)
+            await process_item.set_status("in_progress")
+            decision_text = decision.message[0].text if decision.message else ""
+            if "approve" in decision_text.lower():
+                result = f"Expense approved. {decision_text}"
+            else:
+                result = f"Expense rejected. {decision_text}"
+            await process_item.set_status("done")
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=result)]
+        )
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(workflows.run_worker([FullExpenseWorkflow]))
+```
+
+The worker in this scaffold auto-discovers `@workflows.workflow.define` classes under `apps/worker/src/worker/workflows/`, so the `run_worker` block above is unnecessary. Start the worker with `mistral apps dev --filter worker --json` from the project root.

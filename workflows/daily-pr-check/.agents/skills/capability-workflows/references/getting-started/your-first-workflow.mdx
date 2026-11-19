@@ -1,0 +1,90 @@
+---
+id: your-first-workflow
+title: Your First Workflow
+sidebar_position: 3
+---
+
+# Your First Workflow
+
+This guide assumes `mistral apps init --caps workflows --yes .` scaffolded your project. The worker is vendored at `apps/worker/` and env is seeded in the app-root `.env`, so you only need to set `MISTRAL_API_KEY` there.
+
+To create an app with the Workflows capability in the current directory:
+
+```bash
+mistral apps init --caps workflows --yes .
+```
+
+
+## Step 1: Add a Workflow
+
+Create `apps/worker/src/worker/workflows/my_workflow.py`:
+
+```python
+import mistralai.workflows as workflows
+from pydantic import BaseModel
+
+
+class HelloInput(BaseModel):
+    name: str
+
+
+@workflows.activity()
+async def hello_world(name: str) -> dict:
+    return {"message": f"Hello, {name}!"}
+
+
+@workflows.workflow.define(name="simple_example_workflow")
+class SimpleExampleWorkflow:
+    @workflows.workflow.entrypoint
+    async def run(self, hello: HelloInput) -> dict:
+        return await hello_world(hello.name)
+```
+
+No `run_worker` call and no `__main__` block. The worker auto-discovers every `@workflows.workflow.define` class in the `worker.workflows` package.
+
+
+## Step 2: Set Your API Key
+
+Put a Mistral API key in the app-root `.env`:
+
+```bash
+MISTRAL_API_KEY=<your-key>
+```
+
+Create one in the [Mistral Console](https://console.mistral.ai/). The namespace the worker registers under is derived from the key as `customer_id:workspace_id`.
+
+## Step 3: Start the Worker
+
+From the app root:
+
+```bash
+mistral apps dev --filter worker --json
+```
+
+The worker connects to the Mistral API and registers `simple_example_workflow`. A file watcher restarts it on every `.py` change. You should see the workflow in [AI Studio](https://console.mistral.ai/build/workflows).
+
+## Step 4: Trigger Execution
+
+1. Open [https://console.mistral.ai/](https://console.mistral.ai/) and make sure you're in the workspace you created the API key in.
+2. Click `Workflows` in the left sidebar.
+3. Select `simple_example_workflow`.
+4. Launch it with the input `{"name": <your_name>}`.
+5. Find your execution in the `Executions` list.
+
+## Quick Test
+
+To run the workflow end-to-end without the console, use the test script. It starts its own worker in-process:
+
+```bash
+cd apps/worker
+uv run --all-packages python ../../.agents/skills/capability-workflows/scripts/test_workflow.py \
+  src/worker/workflows/my_workflow.py \
+  --input '{"name": "World"}'
+```
+
+## Next Steps
+
+- [Core Concepts](core-concepts) - Understand the fundamentals
+- [Workflows](../guides/workflows) - Deep dive into workflows
+- [Activities](../guides/activities) - Deep dive into activities
+

@@ -1,0 +1,120 @@
+---
+id: installation
+title: Installation Guide
+sidebar_position: 2
+---
+
+# Installation
+
+## You are already inside a scaffolded app
+
+This skill ships inside an app the CLI already scaffolded, so the Workflows SDK is **already
+installed and wired**. `mistralai-workflows` is a dependency of the worker package
+(`apps/worker/pyproject.toml`), the workspace pins Python 3.14 (`.python-version`) and supports 3.12
+through 3.14 (`requires-python = ">=3.12,<3.15"`), and `uv sync` at the repo root installs
+everything into the shared virtualenv.
+
+Because of that, working in this app:
+
+- **Do not run `uv add mistralai-workflows`** — it is already a dependency, and the CLI owns the
+  cross-capability dependency edges (`@mistralai-capabilities/*`). Re-adding one is redundant when a
+  capability is selected and breaks `mistral apps init` when it is not. Declare a new capability
+  edge in `capability.json` under `dependencies`, not in a `template/` manifest.
+- **Do not re-run the scaffolder** (`mistral apps init --caps workflows --yes .`) — that generates a fresh app and would
+  overwrite what you are working in.
+- To install after pulling changes, run `uv sync` at the repo root.
+- To add an optional extra, edit the owning package's `pyproject.toml` and re-sync (see below). Note
+  that this app deliberately keeps the `mistralai-workflows[mistralai]` extra **off** — it collides
+  with the copy the Agents SDK vendors and breaks every connector.
+
+```bash
+uv sync
+```
+
+Verify the SDK resolves in the workspace virtualenv:
+
+```bash
+uv run --all-packages python -c "import mistralai.workflows; print('Workflows is installed successfully!')"
+```
+
+## Starting a new project from scratch
+
+The rest of this page covers installing the SDK standalone, i.e. **outside** this workspace — when
+you are wiring the SDK into a brand-new project of your own rather than working in a scaffolded app.
+
+## Prerequisites
+
+Before installing the Workflows SDK, ensure you have:
+
+1. Python 3.12–3.14 installed (3.15+ is not yet supported)
+2. [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager installed
+
+## Install Workflows
+
+Install the Workflows package from PyPI using uv:
+
+```bash
+uv add mistralai-workflows
+```
+
+This will create a virtual environment (if one doesn't exist) and install Workflows along with its core dependencies.
+
+## Scaffold a Project with the CLI
+
+
+Create an app with the Workflows capability in the current directory:
+
+```bash
+mistral apps init --caps workflows --yes .
+```
+
+The generated app includes the worker at `apps/worker/` and this skill at `.agents/skills/capability-workflows/SKILL.md`. Continue with [Your First Workflow](your-first-workflow) to configure the API key and start the worker.
+
+
+### Installing with Optional Dependencies
+
+The Workflows SDK provides optional extras for specific features. Install only what you need. In a standalone project you add them with `uv add`; **in this scaffolded app** add the extra to the owning package's `pyproject.toml` and run `uv sync` instead:
+
+#### Cloud Storage Providers
+
+For handling large payloads with [payload offloading](../guides/payload-encoding#payload-offloading):
+
+```bash
+## AWS S3 support
+uv add "mistralai-workflows[s3]"
+
+## Azure Blob Storage support
+uv add "mistralai-workflows[azure]"
+
+## Google Cloud Storage support
+uv add "mistralai-workflows[gcs]"
+
+## All storage providers
+uv add "mistralai-workflows[storage]"
+```
+
+#### Mistral AI Integration
+
+For using Mistral AI models in your workflows:
+
+```bash
+uv add "mistralai-workflows[mistralai]"
+```
+
+> In **this** app, do not add the `[mistralai]` extra — the Agents SDK already vendors
+> `mistralai/{client,workflows,vibe}`, and the extra's plugin collides with that copy.
+
+#### All Optional Features
+
+To install all optional dependencies:
+
+```bash
+uv add "mistralai-workflows[all]"
+```
+
+## Next Steps
+
+Now that you have Workflows installed, you can proceed to:
+
+- [Your First Workflow](your-first-workflow) - Create and run your first workflow
+- [Core Concepts](core-concepts) - Understand the fundamental concepts

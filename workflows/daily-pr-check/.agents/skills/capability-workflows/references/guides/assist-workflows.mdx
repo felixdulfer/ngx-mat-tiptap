@@ -1,0 +1,420 @@
+---
+id: assist-workflows
+title: "Conversational Workflows: Inputs"
+sidebar_position: 9
+---
+
+# Conversational Workflows
+
+Conversational workflows are meant to be integrated in conversations interface, allowing a user to trigger a workflow,
+interact with it by providing inputs during its execution, and follow its progress.
+
+## Getting started
+
+To use Conversational workflow features, install the Mistral plugin:
+
+```bash
+uv add 'mistralai-workflows[mistralai]'
+```
+
+The simplest conversational workflow sends an assistant message to the user, then waits for their response.
+Extend `InteractiveWorkflow` and use `send_assistant_message()` followed by `wait_for_input()` with `ChatInput`:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="greeting-workflow",
+)
+class GreetingWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        # Send a message to the user
+        await workflows_mistralai.send_assistant_message(
+            "Hello! I'm here to help you get started. What's your name?"
+        )
+
+        # Wait for the user's response
+        user_input = await self.wait_for_input(
+            workflows_mistralai.ChatInput()
+        )
+
+        name = user_input.message[0].text if user_input.message else "friend"
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=f"Nice to meet you, {name}!")]
+        )
+```
+
+`send_assistant_message()` displays a message to the user in the chat interface. It also accepts an optional `canvas` keyword argument to include a `CanvasResource` alongside the text (see [Canvas Editing](#canvas-editing-human-in-the-loop)). `ChatInput()` pauses the workflow and waits for the user to respond. You can optionally pass a `prompt` to `ChatInput()` to provide additional context (in placeholder) and `suggestions` to offer pre-filled options that users can select directly.
+
+### Timeout
+
+`wait_for_input()` accepts an optional `timeout` parameter. If the user does not respond within the specified duration, an `asyncio.TimeoutError` is raised. The timeout can be a `timedelta` or a number of seconds (`float`). By default, the workflow waits indefinitely.
+
+```python
+from datetime import timedelta
+
+## Wait for user response, but time out after 5 minutes
+user_input = await self.wait_for_input(
+    workflows_mistralai.ChatInput(),
+    timeout=timedelta(minutes=5),
+)
+```
+
+:::tip
+Wrap the call in a `try`/`except asyncio.TimeoutError` block to handle the timeout gracefully instead of failing the workflow.
+:::
+
+## Structured Form Inputs
+
+For workflows that need structured form input with typed fields, validation, and custom UI rendering, use `FormInput` instead of `ChatInput`:
+
+```python
+from datetime import date, datetime
+
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+from mistralai.workflows.conversational import (
+    FormInput,
+    TextField,
+    NumberField,
+    DateField,
+    DateTimeField,
+    SingleChoice,
+)
+
+class ExpenseForm(FormInput):
+    """Structured form for expense submission."""
+
+    description: str = TextField(description="Expense description")
+    amount: float = NumberField(
+        description="Amount in USD",
+        minimum=0,
+        maximum=10000,
+    )
+    category: str = SingleChoice(
+        options=[
+            ("travel", "Travel"),
+            ("equipment", "Equipment"),
+            ("software", "Software"),
+        ],
+        description="Expense category",
+    )
+    expense_date: date = DateField(description="Date of expense")
+    due_date: datetime = DateTimeField(description="Reimbursement due date")
+    receipt_id: str = TextField(
+        description="Receipt ID",
+        pattern=r"^RCP-\d{6}$",
+    )
+
+@workflows.workflow.define(
+    name="expense-submission-workflow",
+)
+class ExpenseSubmissionWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        expense = await self.wait_for_input(
+            ExpenseForm,
+            label="Submit Expense",
+        )
+
+        result = f"""Expense submitted:
+- Description: {expense.description}
+- Amount: ${expense.amount:.2f}
+- Category: {expense.category}
+- Date: {expense.expense_date.isoformat()}
+- Due date: {expense.due_date.isoformat()}
+- Receipt: {expense.receipt_id}"""
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=result)]
+        )
+```
+
+### Field Types
+
+| Field Type      | Description      | Properties                                                                    |
+| --------------- | ---------------- | ----------------------------------------------------------------------------- |
+| `TextField`     | Text input       | `description`, `pattern` (optional regex)                                     |
+| `NumberField`   | Numeric input    | `description`, `minimum`, `maximum`, `exclusive_minimum`, `exclusive_maximum` |
+| `DateTimeField` | Date/time picker | `description`                                                                 |
+| `DateField`     | Date picker      | `description`                                                                 |
+| `SingleChoice`  | Dropdown/select  | `options` (list of tuples or strings), `description`                          |
+| `MultiChoice`   | Multi-select     | `options` (list of tuples or strings), `description`                          |
+| `FileField`     | File upload      | `description`, `multiple` (default `False`)                                   |
+
+### TextField
+
+```python
+name: str = TextField(description="Your name")
+email: str = TextField(
+    description="Email address",
+    pattern=r"^[\w.-]+@[\w.-]+\.\w+$",  # Optional regex validation
+)
+```
+
+### NumberField
+
+```python
+amount: float = NumberField(
+    description="Amount",
+    minimum=0,           # Inclusive minimum
+    maximum=10000,       # Inclusive maximum
+)
+price: float = NumberField(
+    description="Price",
+    exclusive_minimum=0,   # Must be greater than 0
+    exclusive_maximum=100, # Must be less than 100
+)
+```
+
+### DateTimeField
+
+```python
+from datetime import datetime
+
+scheduled_at: datetime = DateTimeField(description="Schedule date and time")
+```
+
+### DateField
+
+```python
+from datetime import date
+
+scheduled_at: date = DateField(description="Schedule date")
+```
+
+### SingleChoice
+
+```python
+## With labels (value, display_label)
+priority: str = SingleChoice(
+    options=[
+        ("low", "Low Priority"),
+        ("medium", "Medium Priority"),
+        ("high", "High Priority"),
+    ],
+    description="Select priority",
+)
+
+## Simple string options (value = label)
+status: str = SingleChoice(
+    options=["pending", "approved", "rejected"],
+    description="Status",
+)
+```
+
+### MultiChoice
+
+```python
+## With labels (value, display_label)
+tags: list[str] = MultiChoice(
+    options=[
+        ("frontend", "Frontend"),
+        ("backend", "Backend"),
+        ("infra", "Infrastructure"),
+    ],
+    description="Select applicable tags",
+)
+
+## Simple string options (value = label)
+colors: list[str] = MultiChoice(
+    options=["red", "green", "blue"],
+    description="Pick colors",
+)
+```
+
+### FileField
+
+```python
+from mistralai.workflows.conversational import FileField
+
+## Single file upload
+document: str = FileField(description="Upload a document")
+
+## Multiple file uploads
+attachments: list[str] = FileField(description="Upload files", multiple=True)
+```
+
+The workflow receives URLs (strings) pointing to files uploaded by the user. To process a file, download it from the provided URL within your workflow. These URLs may expire, so if your workflow needs long-term access to the files, it is responsible for storing them elsewhere.
+
+## Confirmation Inputs
+
+For workflows that need a simple single-choice confirmation with direct submit, use `ConfirmationInput` or `AcceptDeclineConfirmation`. These helpers create a single-field form where selecting an option immediately submits the form.
+
+### ConfirmationInput
+
+`ConfirmationInput` provides a list of options that should be rendered as buttons. Selection of an option should immediately submit the form:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="type-selection-workflow",
+)
+class TypeSelectionWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        await workflows_mistralai.send_assistant_message("Let's find out your type preference!")
+
+        selection = await self.wait_for_input(
+            workflows_mistralai.ConfirmationInput(
+                options=[
+                    ("fire", "Fire"),
+                    ("water", "Water"),
+                    ("grass", "Grass"),
+                    ("electric", "Electric"),
+                ],
+                description="What is your favorite type?",
+            )
+        )
+
+        selected_type = selection.choice  # Returns the value, e.g., "fire"
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=f"You selected {selected_type}!")]
+        )
+```
+
+| Property      | Type                                   | Description                                                  |
+| ------------- | -------------------------------------- | ------------------------------------------------------------ |
+| `options`     | `list[tuple[str, str]]` or `list[str]` | List of options as `(value, label)` tuples or simple strings |
+| `description` | `str`                                  | Description shown above the options                          |
+
+The returned object has a `choice` property containing the selected option value.
+
+### AcceptDeclineConfirmation
+
+`AcceptDeclineConfirmation` is a specialized confirmation with two options: accept and decline. Clients can render this as a standard validation UI with keyboard shortcuts for quick responses:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="approval-workflow",
+)
+class ApprovalWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        confirmation = await self.wait_for_input(
+            workflows_mistralai.AcceptDeclineConfirmation(
+                description="Do you want to proceed with this action?",
+                accept_label="Yes, proceed",
+                decline_label="Cancel",
+            )
+        )
+
+        if workflows_mistralai.is_accepted(confirmation):
+            return workflows_mistralai.ChatAssistantWorkflowOutput(
+                content=[workflows_mistralai.TextOutput(text="Action confirmed!")]
+            )
+        else:
+            return workflows_mistralai.ChatAssistantWorkflowOutput(
+                content=[workflows_mistralai.TextOutput(text="Action cancelled.")]
+            )
+```
+
+| Property        | Type  | Description                         |
+| --------------- | ----- | ----------------------------------- |
+| `description`   | `str` | Description shown above the buttons |
+| `accept_label`  | `str` | Label for the accept button         |
+| `decline_label` | `str` | Label for the decline button        |
+
+Use the `is_accepted()` helper function to check whether the user accepted or declined:
+
+```python
+if workflows_mistralai.is_accepted(confirmation):
+    # User accepted
+    pass
+else:
+    # User declined
+    pass
+```
+
+## Todo List Progress Tracking
+
+Display a checklist of steps with real-time status updates using `TodoList`:
+
+```python
+import mistralai.workflows as workflows
+import mistralai.workflows.plugins.mistralai as workflows_mistralai
+
+@workflows.workflow.define(
+    name="expense-processing-workflow",
+)
+class ExpenseProcessingWorkflow(workflows.InteractiveWorkflow):
+    @workflows.workflow.entrypoint
+    async def run(self, expense_id: str) -> workflows_mistralai.ChatAssistantWorkflowOutput:
+        # Define the steps
+        validate_item = workflows_mistralai.TodoListItem(
+            title="Validate expense",
+            description="Check expense details and receipts"
+        )
+        approve_item = workflows_mistralai.TodoListItem(
+            title="Get approval",
+            description="Route to manager for approval"
+        )
+        process_item = workflows_mistralai.TodoListItem(
+            title="Process payment",
+            description="Submit for reimbursement"
+        )
+
+        async with workflows_mistralai.TodoList(
+            items=[validate_item, approve_item, process_item]
+        ) as todo_list:
+            # Step 1: Validate (using context manager for automatic status)
+            async with validate_item:
+                pass  # ... validation logic ...
+
+            # Step 2: Approve (using context manager for automatic status)
+            async with approve_item:
+                pass  # ... approval logic ...
+
+            # Step 3: Process (using context manager for automatic status)
+            async with process_item:
+                pass  # ... processing logic ...
+
+        return workflows_mistralai.ChatAssistantWorkflowOutput(
+            content=[workflows_mistralai.TextOutput(text=f"Expense {expense_id} processed successfully")]
+        )
+```
+
+### Updating Item Status
+
+There are two ways to update the status of a `TodoListItem`:
+
+**Context Manager:**
+
+```python
+async with item:
+    # Status automatically set to "in_progress" on enter
+    # ... do work ...
+    # Status automatically set to "done" on successful exit
+```
+
+**Manual Control (for fine-grained status updates):**
+
+```python
+await item.set_status("in_progress")
+## ... do work ...
+await item.set_status("done")
+```
+
+Use manual control when you need to update status at specific points, handle conditional flows, or implement custom exception handling.
+
+### TodoListItem Properties
+
+| Property      | Type                                | Description                           |
+| ------------- | ----------------------------------- | ------------------------------------- |
+| `id`          | `str`                               | Auto-generated UUID                   |
+| `title`       | `str`                               | Display title for the step            |
+| `description` | `str`                               | Detailed description                  |
+| `status`      | `"todo" \| "in_progress" \| "done"` | Current status (defaults to `"todo"`) |
+
+## Continue
+
+- [Rich Output & UI](assist-workflows-output) — streaming responses, canvas rich outputs and editing, rich UI components, tool UI states
+- [Platform Integration](assist-workflows-platform) — publishing in Vibe, tagging input variants, error handling, structured content, and the complete example

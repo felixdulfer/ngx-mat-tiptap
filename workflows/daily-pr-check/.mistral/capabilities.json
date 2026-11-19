@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 4,
+  "requested": [
+    "mistralai-capabilities/backend/workflows",
+    "mistralai-capabilities/deployment/apps"
+  ],
+  "installed": [
+    {
+      "capability": "mistralai-capabilities/backend/workflows",
+      "version": "0.1.71"
+    },
+    {
+      "capability": "mistralai-capabilities/base/core",
+      "version": "0.1.71"
+    },
+    {
+      "capability": "mistralai-capabilities/deployment/apps",
+      "version": "0.1.71"
+    }
+  ]
+}
