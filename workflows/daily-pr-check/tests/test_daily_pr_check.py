@@ -5,6 +5,7 @@ from typing import Any
 
 import httpx
 import pytest
+
 from worker.workflows.daily_pr_check import (
     DailyPrCheckWorkflow,
     fetch_open_prs,

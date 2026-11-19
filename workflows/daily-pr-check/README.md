@@ -1,42 +1,34 @@
 # daily-pr-check
 
-A [Mistral Workflow](https://docs.mistral.ai/studio/workflows/overview) (Python, `mistralai-workflows` SDK) that
-runs daily at 09:00 UTC and produces a summary of every open pull request across all repositories of a GitHub
-user (default `felixdulfer`): PR number, title, author, age, CI status of the head commit, and latest review
-decision. PRs open longer than `stale_after_days` (default 14) are flagged as stale.
+A [Mistral Workflow](https://docs.mistral.ai/studio/workflows/overview) (`mistralai-workflows` SDK) that runs
+daily at 09:00 UTC and summarizes every open pull request across all repositories of a GitHub user (default
+`felixdulfer`): PR number, title, author, age, CI status of the head commit, latest review decision. PRs open
+longer than `stale_after_days` (default 14) are flagged stale. The report is the execution result (Mistral
+Studio → Workflows → `daily-pr-check` → Executions); nothing is posted anywhere.
 
-The report is the workflow execution's result (visible in Mistral Studio under Workflows → `daily-pr-check` →
-Executions). Nothing is posted anywhere else.
+## Files
 
-## Layout
+- `src/worker/workflows/daily_pr_check.py` — the `daily-pr-check` workflow and its GitHub activities
+- `src/worker/__main__.py` — worker entrypoint (discovers `worker.workflows`, serves them)
+- `tests/` — pytest tests on an in-memory Temporal environment with a stubbed GitHub API
+- `Dockerfile` — managed-deployment image (build context: this directory)
 
-Scaffolded with `mistral workflows init`; the workflow itself is
-[`apps/worker/src/worker/workflows/daily_pr_check.py`](apps/worker/src/worker/workflows/daily_pr_check.py).
-The worker entrypoint auto-discovers every workflow in `worker.workflows`, so no registration list exists.
-
-- `apps/worker/src/worker/workflows/daily_pr_check.py` — workflow `daily-pr-check`, its input/output models, and the GitHub activities
-- `apps/worker/tests/test_daily_pr_check.py` — pytest tests on an in-memory Temporal environment with a stubbed GitHub API
-- `deploy/docker/Dockerfile.worker` — image for the managed deployment (build context: this directory)
-
-## Running locally
+## Local checks
 
 ```bash
 cd workflows/daily-pr-check
-uv sync --all-packages --group dev
-cd apps/worker && uv run --all-packages pytest tests/ -q
+uv sync --group dev
+uv run pytest -q
 ```
 
 ## Deployment and schedule
 
-The managed deployment builds this directory from the pushed commit:
-
-- deployment name: `daily-pr-check`
-- build context: `workflows/daily-pr-check`, Dockerfile `deploy/docker/Dockerfile.worker`
-- the workspace secret `GITHUB_TOKEN` is bound to the `GITHUB_TOKEN` env var (create the secret in
-  Mistral Studio → Secrets; a fine-grained PAT with read access to the user's repositories is enough)
-
-The daily schedule (`0 9 * * *` UTC, input `{"owner": "felixdulfer"}`) is created through the Workflows API
-(`create_workflow_schedule`), not in worker code, so it survives redeploys.
+Managed deployment `daily-pr-check` builds this directory from the pushed commit (build context
+`workflows/daily-pr-check`, Dockerfile `Dockerfile`). GitHub access reads the `GITHUB_TOKEN` env var, bound
+from the `GITHUB_TOKEN` workspace secret (create it in Mistral Studio → Secrets; a fine-grained PAT with
+read access to the user's repositories is enough — scheduled runs cannot use the user-scoped OAuth credential
+on the `github_app` connector). The daily schedule (`0 9 * * *` UTC, input `{"owner": "felixdulfer"}`) is
+created via the Workflows API, not in worker code.
 
 ## Workflow input
 
