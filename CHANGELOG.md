@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/felixdulfer/ngx-mat-tiptap/compare/v0.8.1...v0.9.0) (2026-11-23)
+
+
+### Features
+
+* add project-scoped security-audit skill for dependency audits ([282fc1d](https://github.com/felixdulfer/ngx-mat-tiptap/commit/282fc1da53979ec6c31a51a85b06deba818911a6))
+
 ## [0.8.1](https://github.com/felixdulfer/ngx-mat-tiptap/compare/v0.8.0...v0.8.1) (2026-11-18)
 
 
