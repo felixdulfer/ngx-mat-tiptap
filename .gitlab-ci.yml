@@ -1,0 +1,61 @@
+image: node:24-alpine
+
+stages:
+  - setup
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "24"
+  NG_CLI_VERSION: "22.0.7"
+
+cache:
+  paths:
+    - node_modules/
+    - .angular/cache/
+
+# Install dependencies
+# pnpm (via corepack, pinned by packageManager: pnpm@9.0.0) so the install
+# matches pnpm-lock.yaml and runs on a Node version that satisfies engines.
+install_dependencies:
+  stage: setup
+  script:
+    - corepack enable
+    - pnpm install --frozen-lockfile
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+
+# Build the demo app
+build_demo:
+  stage: build
+  dependencies:
+    - install_dependencies
+  script:
+    - npm run build:demo
+  artifacts:
+    paths:
+      - dist/demo/
+    expire_in: 1 week
+  only:
+    - main
+    - master
+
+# Deploy to GitLab Pages
+deploy_to_pages:
+  stage: deploy
+  dependencies:
+    - build_demo
+  script:
+    - mv dist/demo/* public/
+  artifacts:
+    paths:
+      - public/
+    expire_in: 1 week
+  only:
+    - main
+    - master
+  environment:
+    name: production
+    url: $CI_PAGES_URL 
