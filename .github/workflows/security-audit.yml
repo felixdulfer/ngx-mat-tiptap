@@ -1,0 +1,66 @@
+name: Security Audit
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Dependency vulnerability audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      # Informational only: always succeeds (|| true) so the job never fails
+      # here. Prints per-severity advisory counts so the log stays useful
+      # even when the critical gate below passes.
+      - name: Print per-severity audit summary (informational, never fails)
+        run: |
+          pnpm audit --json > audit-summary.json || true
+          node -e '
+            const fs = require("fs");
+            let data = {};
+            try {
+              data = JSON.parse(fs.readFileSync("audit-summary.json", "utf8"));
+            } catch (e) {
+              console.log("Could not parse pnpm audit --json output:", e.message);
+            }
+            const counts = { critical: 0, high: 0, moderate: 0, low: 0, info: 0 };
+            const meta = (data.metadata && data.metadata.vulnerabilities) || null;
+            if (meta && typeof meta === "object") {
+              for (const sev of Object.keys(counts)) counts[sev] = meta[sev] ?? 0;
+            } else {
+              for (const adv of Object.values(data.advisories || {})) {
+                if (Object.prototype.hasOwnProperty.call(counts, adv.severity)) counts[adv.severity]++;
+              }
+            }
+            console.log("=== Dependency audit summary (all severities) ===");
+            for (const [sev, n] of Object.entries(counts)) console.log(`${sev}: ${n}`);
+          ' || true
+          rm -f audit-summary.json
+
+      # Blocking gate: pnpm audit exits non-zero when any advisory at or
+      # above the given level exists. We intentionally fail the job on
+      # NEW critical vulnerabilities.
+      - name: Security gate — fail on critical vulnerabilities
+        run: pnpm audit --audit-level=critical
