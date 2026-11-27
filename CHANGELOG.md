@@ -1,3 +1,11 @@
+## [0.9.1](https://github.com/felixdulfer/ngx-mat-tiptap/compare/v0.9.0...v0.9.1) (2026-11-27)
+
+
+### Bug Fixes
+
+* **ci:** run release workflow on Node 26 (semantic-release 26 needs >=26.13) ([4c13cf8](https://github.com/felixdulfer/ngx-mat-tiptap/commit/4c13cf80fc372bb36935930ea68c899b567e2234)), closes [#39](https://github.com/felixdulfer/ngx-mat-tiptap/issues/39)
+* sync pnpm-lock.yaml with merged [@semantic-release](https://github.com/semantic-release) major bumps ([#40](https://github.com/felixdulfer/ngx-mat-tiptap/issues/40), [#41](https://github.com/felixdulfer/ngx-mat-tiptap/issues/41)) ([d26b107](https://github.com/felixdulfer/ngx-mat-tiptap/commit/d26b107678cbe0bfe68f524ad8946fb5992c2ce0))
+
 # [0.9.0](https://github.com/felixdulfer/ngx-mat-tiptap/compare/v0.8.1...v0.9.0) (2026-11-23)
 
 
